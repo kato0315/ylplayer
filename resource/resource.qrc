@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>quit.png</file>
+        <file>videologo.png</file>
+        <file>kerboard_guide.png</file>
+    </qresource>
+</RCC>
