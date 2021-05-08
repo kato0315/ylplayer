@@ -93,6 +93,7 @@ void Dialog::onClickedBtnDelete()
 
 }
 
+
 //按键设置
 void Dialog::setBtn()
 {
@@ -100,6 +101,7 @@ void Dialog::setBtn()
     btnAdd = new QPushButton(this);
     btnDelete = new QPushButton(this);
     btnQuit = new QPushButton(this);
+    btnBack = new QPushButton(this);
 
     QFont btnFont;
     btnFont.setPointSize(14);
@@ -120,20 +122,28 @@ void Dialog::setBtn()
     btnAdd->setStyleSheet("background-color:#32363b;color:#ffffff;border-color:#76B900;");
     btnAdd->move(1400,260);
     btnAdd->resize(240,80);
-    connect(btnAdd,&QPushButton::clicked,this,&Dialog::onClickedBtnAdd);
+    connect(btnAdd,&QPushButton::clicked,mainWidget,&fileWidget::onClickedBtnAdd);
 
     btnDelete->setText("删除视频");
     btnDelete->setFont(btnFont);
     btnDelete->setStyleSheet("background-color:#32363b;color:#ffffff;border-color:#76B900;");
     btnDelete->move(1400,360);
     btnDelete->resize(240,80);
-    connect(btnDelete,&QPushButton::clicked,this,&Dialog::onClickedBtnDelete);
+    connect(btnDelete,&QPushButton::clicked,mainWidget,&fileWidget::onClickedBtnDelete);
+
+    btnBack->setText("后退");
+    btnBack->setFont(btnFont);
+    btnBack->setStyleSheet("background-color:#32363b;color:#ffffff;border-color:#76B900;");
+    btnBack->move(1400,460);
+    btnBack->resize(240,80);
+    connect(btnBack,&QPushButton::clicked,mainWidget,&fileWidget::onClickedBtnBack);
 
     btnQuit->setStyleSheet("border-image:url(:/quit.png)");
     btnQuit->move(1870,30);
     btnQuit->resize(30,30);
    // btnQuit->setIcon(QIcon(":/quit.png"));
     connect(btnQuit,&QPushButton::clicked,this,&Dialog::close);
+
 
 }
 

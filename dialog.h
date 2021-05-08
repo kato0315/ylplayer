@@ -24,6 +24,7 @@
 
 #include <QDir>
 
+#include "server.h"
 
 
 namespace Ui {
@@ -38,6 +39,7 @@ protected:
     void keyPressEvent(QKeyEvent *event);
 
 private:
+    Server server;
     Ui::Dialog *ui;
     playWidget p;
     QLabel* titleLb;
@@ -51,6 +53,7 @@ private:
     QPushButton* btnAdd;
     QPushButton* btnDelete;
     QPushButton* btnQuit;
+    QPushButton* btnBack;
 
     fileWidget* mainWidget;
 /*
@@ -67,6 +70,7 @@ private slots:
     void onClickedBtnPlay();
     void onClickedBtnAdd();
     void onClickedBtnDelete();
+
     void paintEvent(QPaintEvent *);
 
 

@@ -17,7 +17,8 @@
 #include <QButtonGroup>
 #include <QScrollArea>
 #include <QScrollBar>
-#include <QTimer>
+
+#include <QFileDialog>
 
 #include <toolbutton.h>
 
@@ -41,8 +42,12 @@ public:
 
 protected slots:
     void onDoubleClickedButton();
+public slots:
+    void onClickedBtnAdd();
+    void onClickedBtnDelete();
+    void onClickedBtnBack();
 
-    void test01();
+
 private:
     Ui::fileWidget *ui;
 
@@ -71,7 +76,9 @@ private:
     void uiInit();
 
     void deleteDirButton();
-    void changeDirButton();
+    void deleteFileButton();
+    void createDirButton();
+    void createFileButton();
     void changeCurrentDir(QString dirString);
 
 

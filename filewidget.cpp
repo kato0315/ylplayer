@@ -14,6 +14,83 @@ fileWidget::~fileWidget()
     delete ui;
 }
 
+//槽函数
+void fileWidget::onDoubleClickedButton()
+{
+    //获取更换的路径
+    QString changePath = currentDir->path() +"/" +((QToolButton*)sender())->text();
+    changeCurrentDir(changePath);
+
+
+}
+
+void fileWidget::onClickedBtnAdd()
+{
+    qDebug() << "button add" <<endl;
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("添加视频文件"),
+                                                    "E:");
+    if(fileName != NULL){
+        QFile chosenFile(fileName);
+        QFileInfo chosenFileInfo(chosenFile);
+
+        if(chosenFileInfo.path() != currentDir->path())
+        {
+            QString copiedFileName =currentDir->path() + "/" + chosenFileInfo.fileName();
+            chosenFile.copy(copiedFileName);
+            deleteFileButton();
+            createFileButton();
+        }
+        else
+            //qDebug() << "same path"<<endl;
+            return;
+
+    }
+    else
+        qDebug() << "quit" <<endl;
+}
+
+void fileWidget::onClickedBtnDelete()
+{
+    qDebug() << "button delete" <<endl;
+    if(getCheckedButton()!=NULL)
+    {
+        qDebug() <<getCheckedButton()->text()<<endl;
+        QString deleteFileName = currentDir->path() + "/" +getCheckedButton()->text();
+        QFile deleteFile(deleteFileName);
+
+        deleteFileButton();
+
+        if(deleteFile.remove())
+        {
+            qDebug() << "remove success";
+            createFileButton();
+        }
+        else
+        {
+            qDebug() << "remove fail";
+            createFileButton();
+            return;
+        }
+
+    }
+    else
+        qDebug() << "no checked button"<<endl;
+
+}
+
+void fileWidget::onClickedBtnBack()
+{
+
+    if(currentDir->path() != default_path){
+        currentDir->cdUp();
+        changeCurrentDir(currentDir->path());
+    }
+    else
+        qDebug() << "no back" <<endl;
+}
+
+//设置背景颜色
 void fileWidget::paintEvent(QPaintEvent *)
 {
     QPainter mainPainter(this);
@@ -25,6 +102,7 @@ void fileWidget::paintEvent(QPaintEvent *)
 
 }
 
+//设置基本布局
 void fileWidget::setBackground()
 {
     this->setFixedSize(800,800);
@@ -49,6 +127,7 @@ void fileWidget::setBackground()
     dirTitle->setStyleSheet("color:#ffffff");
 }
 
+//设置文件显示框
 void fileWidget::setFileArea()
 {
     fileSa = new QScrollArea(this);
@@ -65,6 +144,7 @@ void fileWidget::setFileArea()
     fileButtonGroup->setExclusive(true);//设置互斥，实现单选效果
 }
 
+//设置目录显示框
 void fileWidget::setDirArea()
 {
     dirSa = new QScrollArea(this);
@@ -81,6 +161,7 @@ void fileWidget::setDirArea()
     dirButtonGroup->setExclusive(true);
 }
 
+//设置路径显示框
 void fileWidget::setPathArea()
 {
     currentDir = new QDir();
@@ -94,73 +175,41 @@ void fileWidget::setPathArea()
 
 }
 
+//返回选中文件的按钮
 QAbstractButton* fileWidget::getCheckedButton()
 {
     return fileButtonGroup->checkedButton();
 }
 
+//更换目录时释放原有的按钮
 void fileWidget::deleteDirButton()
 {
     QToolButton* tempbutton;
 
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
-
-
-
     for(int i =0;i<dirList.size();i++){
         tempbutton = (QToolButton*)dirButtonGroup->button(i);
+        delete tempbutton; 
+    }
+}
 
+
+void fileWidget::deleteFileButton()
+{
+    QToolButton* tempbutton;
+
+    QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
+    for(int i =0;i<dirList.size();i++){
+        tempbutton = (QToolButton*)fileButtonGroup->button(i);
         delete tempbutton;
-        qDebug() << "delete " << i <<" button"<<endl;
     }
 }
 
-void fileWidget::changeCurrentDir(QString dirString)
-{
-    //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
-    if(dirButtonGroup->button(0) != NULL){
-        deleteDirButton();
-
-    }
-    //修改路径
-    currentDir->setPath(dirString);
-    videoPathLb->setText(currentDir->path());
-    //创建新路径中的文件按钮
-    changeDirButton();
-}
-
-void fileWidget::test01()
-{
-   deleteDirButton();
-
-}
-
-
-void fileWidget::onDoubleClickedButton()
-{
-    QString changePath = currentDir->path() +"/" +((QToolButton*)sender())->text();
-    qDebug() << changePath<<endl;
-    changeCurrentDir(changePath);
-
-
-}
-/*
-void fileWidget::changeCurrentDir()
-{
-    qDebug() << "change dir"<<endl;
-    qDebug() << ((QToolButton*)sender())->text()<<endl;
-    QString changePath = currentDir->path() +"/" +((QToolButton*)sender())->text();
-    qDebug() << changePath<<endl;
-    setCurrentDir(changePath);
-}
-*/
-
-void fileWidget::changeDirButton()
+//创建按钮
+void fileWidget::createDirButton()
 {
     QFileIconProvider icon_provider;
-
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
-    qDebug() << "file number:" << dirList.size();
 
     if(dirList.size() > 10){
         //文件布局位置超出原界面则扩展原界面大小
@@ -168,7 +217,6 @@ void fileWidget::changeDirButton()
     }
 
     for(int i =0;i < dirList.size();i++){
-        qDebug() << dirList.at(i).fileName();
         dirButton = new toolbutton(videoDir);
 
         dirButton->resize(90,100);
@@ -191,18 +239,15 @@ void fileWidget::changeDirButton()
         dirButtonGroup->setId(dirButton,i);
         dirButton->move(15+(i%5)*135,15+((i/5)*150));
 
-        qDebug() << dirButtonGroup->button(i)->text()<<endl;
         connect(dirButton,SIGNAL(doubleClicked()),this,SLOT(onDoubleClickedButton()));
         dirButton->show();
     }
 
 }
 
+void fileWidget::createFileButton()
+{
 
-
-
-
-    /*
     QFileIconProvider icon_provider;
 
     QFileInfoList filelist = currentDir->entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
@@ -236,12 +281,28 @@ void fileWidget::changeDirButton()
 
         fileButton->setText(filelist.at(i).fileName());
         fileButtonGroup->addButton(fileButton);
+        fileButtonGroup->setId(fileButton,i);
         fileButton->move(15+(i%5)*135,15+((i/5)*150));
-
+        fileButton->show();
     }
-*/
 
+}
 
+//更换目录
+void fileWidget::changeCurrentDir(QString dirString)
+{
+    //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
+    if(dirButtonGroup->button(0) != NULL | fileButtonGroup->button(0) != NULL){
+        deleteDirButton();
+        deleteFileButton();
+    }
+    //修改路径
+    currentDir->setPath(dirString);
+    videoPathLb->setText(currentDir->path());
+    //创建新路径中的文件按钮
+    createDirButton();
+    createFileButton();
+}
 
 void fileWidget::uiInit()
 {
