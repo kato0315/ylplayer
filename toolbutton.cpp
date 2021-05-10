@@ -15,7 +15,7 @@ void toolbutton::mouseDoubleClickEvent(QMouseEvent *ev)
     if(ev->button() == Qt::LeftButton){
 
         //qDebug() << "double click test";
-        emit doubleClicked();
+        emit doubleClicked(this->text());
     }
 
 

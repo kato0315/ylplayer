@@ -13,7 +13,7 @@ public:
     toolbutton(QWidget *parent);
     ~toolbutton();
 signals:
-    void doubleClicked();
+    void doubleClicked(QString);
 protected:
     void mouseDoubleClickEvent(QMouseEvent *ev);
 };

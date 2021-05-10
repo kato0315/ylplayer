@@ -26,7 +26,7 @@ namespace Ui {
 class fileWidget;
 }
 
-const QString default_path = "E:/work_station/testvideo";
+const QString default_path = "D://";
 
 class fileWidget : public QWidget
 {
@@ -41,7 +41,7 @@ public:
 
 
 protected slots:
-    void onDoubleClickedButton();
+    void onDoubleClickedButton(QString text);
 public slots:
     void onClickedBtnAdd();
     void onClickedBtnDelete();
@@ -79,6 +79,7 @@ private:
     void deleteFileButton();
     void createDirButton();
     void createFileButton();
+    void changeCurrentDir();//后退
     void changeCurrentDir(QString dirString);
 
 

@@ -15,11 +15,12 @@ fileWidget::~fileWidget()
 }
 
 //槽函数
-void fileWidget::onDoubleClickedButton()
+void fileWidget::onDoubleClickedButton(QString text)
 {
+    //qDebug() << text <<endl;
     //获取更换的路径
-    QString changePath = currentDir->path() +"/" +((QToolButton*)sender())->text();
-    changeCurrentDir(changePath);
+   // QString changePath = currentDir->path() +"/" +((QToolButton*)sender())->text();
+    changeCurrentDir(text);
 
 
 }
@@ -83,8 +84,8 @@ void fileWidget::onClickedBtnBack()
 {
 
     if(currentDir->path() != default_path){
-        currentDir->cdUp();
-        changeCurrentDir(currentDir->path());
+
+        changeCurrentDir();
     }
     else
         qDebug() << "no back" <<endl;
@@ -136,10 +137,11 @@ void fileWidget::setFileArea()
     fileSa->verticalScrollBar();//垂直拖动条
     fileSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    videoFile = new QWidget(fileSa);
+    videoFile = new QWidget();
+   // videoFile->setGeometry(0,0,700,600);
+    fileSa->setWidget(videoFile);
+
     videoFile->setGeometry(0,0,700,300);
-
-
     fileButtonGroup = new QButtonGroup(this);
     fileButtonGroup->setExclusive(true);//设置互斥，实现单选效果
 }
@@ -153,7 +155,8 @@ void fileWidget::setDirArea()
     dirSa->verticalScrollBar();//垂直拖动条
     dirSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    videoDir = new QWidget(dirSa);
+    videoDir = new QWidget();
+    dirSa->setWidget(videoDir);
     videoDir->setGeometry(0,0,700,300);
 
 
@@ -199,8 +202,11 @@ void fileWidget::deleteFileButton()
     QToolButton* tempbutton;
 
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
+    qDebug() << currentDir->path();
+    qDebug() << "delete file number:" << dirList.size();
     for(int i =0;i<dirList.size();i++){
         tempbutton = (QToolButton*)fileButtonGroup->button(i);
+        qDebug() <<"delete button"<<endl;
         delete tempbutton;
     }
 }
@@ -215,6 +221,8 @@ void fileWidget::createDirButton()
         //文件布局位置超出原界面则扩展原界面大小
         videoDir->resize(700,150*(dirList.size()/5));
     }
+    else
+        videoDir->resize(700,300);
 
     for(int i =0;i < dirList.size();i++){
         dirButton = new toolbutton(videoDir);
@@ -239,7 +247,7 @@ void fileWidget::createDirButton()
         dirButtonGroup->setId(dirButton,i);
         dirButton->move(15+(i%5)*135,15+((i/5)*150));
 
-        connect(dirButton,SIGNAL(doubleClicked()),this,SLOT(onDoubleClickedButton()));
+        connect(dirButton,SIGNAL(doubleClicked(QString)),this,SLOT(onDoubleClickedButton(QString)));
         dirButton->show();
     }
 
@@ -257,6 +265,8 @@ void fileWidget::createFileButton()
         //文件布局位置超出原界面则扩展原界面大小
         videoFile->resize(700,150*(filelist.size()/5));
     }
+    else
+        videoFile->resize(700,300);
 
     for(int i =0;i<filelist.size();i++){
 
@@ -289,6 +299,22 @@ void fileWidget::createFileButton()
 }
 
 //更换目录
+void fileWidget::changeCurrentDir()
+{
+    //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
+    if(dirButtonGroup->button(0) != NULL | fileButtonGroup->button(0) != NULL){
+        deleteDirButton();
+        deleteFileButton();
+    }
+    //修改路径
+    currentDir->cdUp();
+    videoPathLb->setText(currentDir->path());
+    //创建新路径中的文件按钮
+    createDirButton();
+    createFileButton();
+
+}
+
 void fileWidget::changeCurrentDir(QString dirString)
 {
     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
@@ -297,7 +323,7 @@ void fileWidget::changeCurrentDir(QString dirString)
         deleteFileButton();
     }
     //修改路径
-    currentDir->setPath(dirString);
+    currentDir->cd(dirString);
     videoPathLb->setText(currentDir->path());
     //创建新路径中的文件按钮
     createDirButton();
