@@ -2,7 +2,7 @@
 
 Server::Server(QObject *parent) : QTcpServer(parent)
 {
-    listen(QHostAddress::Any,8888);
+    listen(QHostAddress::Any,18888);
 }
 
 
@@ -21,4 +21,10 @@ void Server::receiveMessage()
     char buffer[1024];
     socket->read(buffer,socket->bytesAvailable());
     qDebug() << buffer;
+}
+
+void Server::sendMessage(char *data, int len)
+{
+    socket->write(data,len);
+
 }

@@ -75,7 +75,10 @@ void Dialog::setupShadowBox()
 void Dialog::onClickedBtnPlay()
 {
     qDebug() << "test BtnPlay" <<endl;
-    qDebug() << "get checked button" << mainWidget->getCheckedButton()->text();
+    server.sendMessage(COMMAND_SET_SOURCE,strlen(COMMAND_SET_SOURCE));
+    //qDebug() << "get checked button" << mainWidget->getCheckedButton()->text();
+    //QByteArray ba = mainWidget->getCheckedButton()->text().toLatin1();
+    //server.sendMessage(ba.data(),strlen(ba.data()));
     //p.show();
 
 }
@@ -159,9 +162,9 @@ void Dialog::setUi()
 
 
     this->setFixedSize(1920,1080);
-    this->setWindowFlags(Qt::WindowStaysOnTopHint|//置顶
+    /*this->setWindowFlags(Qt::WindowStaysOnTopHint|//置顶
                          Qt::X11BypassWindowManagerHint|//兼容x11环境
-                         Qt::FramelessWindowHint);//去掉边框
+                         Qt::FramelessWindowHint);//去掉边框*/
     this->setAttribute(Qt::WA_TranslucentBackground);
     //test01();
     setupShadowBox();

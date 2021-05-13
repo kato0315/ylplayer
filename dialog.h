@@ -23,6 +23,7 @@
 #include <QFileIconProvider>
 
 #include <QDir>
+#include <QByteArray>
 
 #include "server.h"
 
