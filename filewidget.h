@@ -38,7 +38,7 @@ public:
 
     QAbstractButton* getCheckedButton();
 
-
+    QString getCurrentDirPath();
 
 protected slots:
     void onDoubleClickedButton(QString text);

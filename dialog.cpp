@@ -75,7 +75,14 @@ void Dialog::setupShadowBox()
 void Dialog::onClickedBtnPlay()
 {
     qDebug() << "test BtnPlay" <<endl;
-    server.sendMessage(COMMAND_SET_SOURCE,strlen(COMMAND_SET_SOURCE));
+    QString seturl = "set url:";
+    //seturl = (char*)"set url:";
+    //data = strcat("set url",":");
+    QString filepath = mainWidget->getCurrentDirPath()+"/"+mainWidget->getCheckedButton()->text();
+    QByteArray ba = (seturl+filepath).toLatin1();
+    printf("%s",ba.data());
+
+    server.sendMessage(ba.data(),strlen(ba.data()));
     //qDebug() << "get checked button" << mainWidget->getCheckedButton()->text();
     //QByteArray ba = mainWidget->getCheckedButton()->text().toLatin1();
     //server.sendMessage(ba.data(),strlen(ba.data()));

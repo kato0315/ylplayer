@@ -14,6 +14,11 @@ fileWidget::~fileWidget()
     delete ui;
 }
 
+QString fileWidget::getCurrentDirPath()
+{
+    return currentDir->path();
+}
+
 //槽函数
 void fileWidget::onDoubleClickedButton(QString text)
 {
