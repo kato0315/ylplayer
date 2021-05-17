@@ -5,17 +5,36 @@
 
 #include <QTcpServer>
 #include <QTcpSocket>
-
 #include <QDebug>
+#include <QString>
 
-#define COMMAND_SET_SOURCE      "set url"   //* set url of media file.
-#define COMMAND_PLAY            "play"   //* start playback.
-#define COMMAND_PAUSE           "pause"   //* pause the playback.
-#define COMMAND_STOP            "stop"   //* stop the playback.
-#define COMMAND_SEEKTO          "seek to"   //* seek to posion, in unit of second.
-#define COMMAND_SHOW_MEDIAINFO  "show media info"   //* show media information.
-#define COMMAND_SHOW_DURATION   "show duration"   //* show media duration, in unit of second.
-#define COMMAND_SHOW_POSITION   "show position"   //* show current play position, in unit of second.
+#define COMMAND_SET_SOURCE      0x101   //* set url of media file.
+#define COMMAND_PLAY            0x102   //* start playback.
+#define COMMAND_PAUSE           0x103   //* pause the playback.
+#define COMMAND_STOP            0x104   //* stop the playback.
+#define COMMAND_SEEKTO          0x105   //* seek to posion, in unit of second.
+#define COMMAND_SHOW_MEDIAINFO  0x106   //* show media information.
+#define COMMAND_SHOW_DURATION   0x107   //* show media duration, in unit of second.
+#define COMMAND_SHOW_POSITION   0x108   //* show current play position, in unit of second.
+
+typedef struct Command
+{
+    const char* strCommand;
+    int nCommandId;
+}Command;
+
+const Command commands[] =
+{
+    {"set url:",COMMAND_SET_SOURCE},
+    {"play",COMMAND_PLAY},
+    {"pause",COMMAND_PAUSE},
+    {"stop",COMMAND_STOP},
+    {"seek to",COMMAND_SEEKTO},
+    {"show media info",COMMAND_SHOW_MEDIAINFO},
+    {"show duration",COMMAND_SHOW_DURATION},
+    {"show position",COMMAND_SHOW_POSITION},
+    {"NULL",0}
+};
 
 
 class Server : public QTcpServer

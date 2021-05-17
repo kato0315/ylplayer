@@ -14,17 +14,39 @@ playWidget::~playWidget()
     delete ui;
 }
 
+
+ void playWidget::setPlayStatus(bool status)
+ {
+     playStatus = status;
+
+ }
 void playWidget::keyPressEvent(QKeyEvent *event)
 {
+
     switch(event->key())
     {
     case Qt::Key_Escape:
+        strcpy(cmd,commands[3].strCommand);
+        server->sendMessage(cmd,strlen(cmd));
+        playStatus = false;
         this->close();
         break;
     case Qt::Key_Space:
+        if(playStatus == true){
+            strcpy(cmd,commands[2].strCommand);
+            server->sendMessage(cmd,strlen(cmd));
+            playStatus = false;
+        }
+        else{
+            strcpy(cmd,commands[1].strCommand);
+            server->sendMessage(cmd,strlen(cmd));
+            playStatus = true;
+        }
         qDebug() << "pause function" << endl;
+        break;
     case Qt::Key_Left:
         qDebug() << "back 10 seconds" <<endl;
+        break;
     case Qt::Key_Right:
         qDebug() << "forward 10 seconds" <<endl;
         break;

@@ -25,6 +25,8 @@
 #include <QDir>
 #include <QByteArray>
 
+#include <QTimer>
+
 #include "server.h"
 
 
@@ -36,11 +38,11 @@ class Dialog : public QDialog
 {
     Q_OBJECT
 protected:
-
+    Server* server;
     void keyPressEvent(QKeyEvent *event);
 
+
 private:
-    Server server;
     Ui::Dialog *ui;
     playWidget p;
     QLabel* titleLb;
@@ -69,8 +71,7 @@ private slots:
     void setUi();
 
     void onClickedBtnPlay();
-    void onClickedBtnAdd();
-    void onClickedBtnDelete();
+
 
     void paintEvent(QPaintEvent *);
 

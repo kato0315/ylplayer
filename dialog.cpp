@@ -82,26 +82,16 @@ void Dialog::onClickedBtnPlay()
     QByteArray ba = (seturl+filepath).toLatin1();
     printf("%s",ba.data());
 
-    server.sendMessage(ba.data(),strlen(ba.data()));
+    server->sendMessage(ba.data(),strlen(ba.data()));
+
     //qDebug() << "get checked button" << mainWidget->getCheckedButton()->text();
     //QByteArray ba = mainWidget->getCheckedButton()->text().toLatin1();
     //server.sendMessage(ba.data(),strlen(ba.data()));
-    //p.show();
+    p.show();
+    p.setPlayStatus(true);
 
 }
 
-void Dialog::onClickedBtnAdd()
-{
-    qDebug() << "test BtnAdd" <<endl;
-
-
-}
-
-void Dialog::onClickedBtnDelete()
-{
-    qDebug() << "test BtnDelete" <<endl;
-
-}
 
 
 //按键设置
@@ -164,8 +154,8 @@ void Dialog::setBtn()
 void Dialog::setUi()
 {
     mainWidget = new fileWidget(this);
-
-    //mainWidget.move(0,0);
+    server = new Server(this);
+    p.server = this->server;
 
 
     this->setFixedSize(1920,1080);
@@ -176,7 +166,6 @@ void Dialog::setUi()
     //test01();
     setupShadowBox();
     setBtn();
-
 
 
 }
