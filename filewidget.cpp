@@ -104,14 +104,14 @@ void fileWidget::paintEvent(QPaintEvent *)
     QBrush brush(QColor(38,43,47));
     mainPainter.setPen(pen1);
     mainPainter.setBrush(brush);
-    mainPainter.drawRect(QRect(0,0,800,800));
+    mainPainter.drawRect(QRect(0,0,this->width(),this->height()));
 
 }
 
 //设置基本布局
 void fileWidget::setBackground()
 {
-    this->setFixedSize(800,800);
+    //this->setFixedSize(800,800);
     QPoint globalpos = this->mapToGlobal(QPoint(0,0));//取父窗口的坐标
     this->move(globalpos.x()+560,globalpos.y()+160);
 

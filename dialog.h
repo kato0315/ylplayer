@@ -25,8 +25,7 @@
 #include <QDir>
 #include <QByteArray>
 
-#include <QTimer>
-
+#include <QDesktopWidget>
 #include "server.h"
 
 
@@ -69,6 +68,7 @@ private slots:
     void setBtn();
     void setupShadowBox();
     void setUi();
+    void setMainWidget();
 
     void onClickedBtnPlay();
 
