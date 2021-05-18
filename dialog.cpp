@@ -75,9 +75,8 @@ void Dialog::setupShadowBox()
 void Dialog::onClickedBtnPlay()
 {
     qDebug() << "test BtnPlay" <<endl;
-    QString seturl = "set url:";
-    //seturl = (char*)"set url:";
-    //data = strcat("set url",":");
+    QString seturl = "play:";
+
     QString filepath = mainWidget->getCurrentDirPath()+"/"+mainWidget->getCheckedButton()->text();
     QByteArray ba = (seturl+filepath).toLatin1();
     printf("%s",ba.data());
@@ -88,7 +87,6 @@ void Dialog::onClickedBtnPlay()
     //QByteArray ba = mainWidget->getCheckedButton()->text().toLatin1();
     //server.sendMessage(ba.data(),strlen(ba.data()));
     p.show();
-    p.setPlayStatus(true);
 
 }
 
@@ -159,9 +157,9 @@ void Dialog::setUi()
 
 
     this->setFixedSize(1920,1080);
-    /*this->setWindowFlags(Qt::WindowStaysOnTopHint|//置顶
+    this->setWindowFlags(Qt::WindowStaysOnTopHint|//置顶
                          Qt::X11BypassWindowManagerHint|//兼容x11环境
-                         Qt::FramelessWindowHint);//去掉边框*/
+                         Qt::FramelessWindowHint);//去掉边框
     this->setAttribute(Qt::WA_TranslucentBackground);
     //test01();
     setupShadowBox();

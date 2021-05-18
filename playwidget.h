@@ -33,13 +33,13 @@ public:
     explicit playWidget(QWidget *parent = 0);
     ~playWidget();
 
-    void setPlayStatus(bool status);
+
     Server *server;
 private:
     Ui::playWidget *ui;
     QLabel* lblBg;
     char cmd[1024];
-    bool playStatus;
+
 
 
 
