@@ -5,6 +5,7 @@ playWidget::playWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::playWidget)
 {
+    quit = false;
     setWidgetUi();
     //ui->setupUi(this);
 }
@@ -29,20 +30,22 @@ void playWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Escape:
         strcpy(cmd,button_commands[2].strCommand);
         server->sendMessage(cmd,strlen(cmd));
+        quit = true;
         this->close();
         break;
-    case Qt::Key_Left:
+    case Qt::Key_Right:
         strcpy(cmd,button_commands[3].strCommand);
         server->sendMessage(cmd,strlen(cmd));
         qDebug() << "back 10 seconds" <<endl;
         break;
-    case Qt::Key_Right:
+    case Qt::Key_Left:
         strcpy(cmd,button_commands[4].strCommand);
         server->sendMessage(cmd,strlen(cmd));
         qDebug() << "forward 10 seconds" <<endl;
         break;
     default:
-        playWidget::keyPressEvent(event);
+        break;
+        //playWidget::keyPressEvent(event);
 
     }
 
@@ -50,8 +53,15 @@ void playWidget::keyPressEvent(QKeyEvent *event)
 
 void playWidget::closeEvent(QCloseEvent *event)
 {
+    if(quit ==true){
+        event->accept();
+        quit = false;
+    }
+    else
+        event->ignore();
+
     qDebug() << "close test" <<endl;
-    event->accept();
+
 }
 void playWidget::setWidgetUi()
 {

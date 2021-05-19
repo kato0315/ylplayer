@@ -39,6 +39,7 @@ private:
     Ui::playWidget *ui;
     QLabel* lblBg;
     char cmd[1024];
+    bool quit;
 
 
 

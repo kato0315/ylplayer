@@ -26,7 +26,7 @@ namespace Ui {
 class fileWidget;
 }
 
-const QString default_path = "D://";
+const QString default_path = "//tsclient/LocalSpace";
 
 class fileWidget : public QWidget
 {

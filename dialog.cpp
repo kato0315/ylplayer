@@ -78,6 +78,7 @@ void Dialog::onClickedBtnPlay()
     QString seturl = "play:";
 
     QString filepath = mainWidget->getCurrentDirPath()+"/"+mainWidget->getCheckedButton()->text();
+    filepath.replace(default_path,"");
     QByteArray ba = (seturl+filepath).toLatin1();
     printf("%s",ba.data());
 
