@@ -43,13 +43,10 @@ protected:
 
 private:
     Ui::Dialog *ui;
-    playWidget p;
+
     QLabel* titleLb;
     QWidget* shadowBox;
     QWidget* videoLogo;
-
-
-
 
     QPushButton* btnPlay;
     QPushButton* btnAdd;
@@ -58,17 +55,15 @@ private:
     QPushButton* btnBack;
 
     fileWidget* mainWidget;
-/*
-    QWidget* mainWidget;
-    QToolButton* test;
-    QLabel* videoDirLb;
-*/
+    playWidget p;
+
 
 private slots:
     void setBtn();
     void setupShadowBox();
     void setUi();
-    void setMainWidget();
+    void setFileWidget();
+    void setPlayWidget();
 
     void onClickedBtnPlay();
 

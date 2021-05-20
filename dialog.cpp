@@ -37,7 +37,7 @@ void Dialog::paintEvent(QPaintEvent *)
 
     titlePainter.setPen(pen);
     titlePainter.setBrush(brush);
-    titlePainter.drawRect(QRect(0,0,1920,100));
+    titlePainter.drawRect(QRect(0,0,this->width(),this->height()/10));
 
 }
 
@@ -77,9 +77,10 @@ void Dialog::onClickedBtnPlay()
     qDebug() << "test BtnPlay" <<endl;
     QString seturl = "play:";
 
-    QString filepath = mainWidget->getCurrentDirPath()+"/"+mainWidget->getCheckedButton()->text();
+    //QString filepath = mainWidget->getCurrentDirPath()+"/"+mainWidget->getCheckedButton()->text();
+    QString filepath = "/"+mainWidget->getCheckedButton()->text();
     filepath.replace(default_path,"");
-    QByteArray ba = (seturl+filepath).toLatin1();
+    QByteArray ba = (seturl+filepath).toUtf8();
     printf("%s",ba.data());
 
     server->sendMessage(ba.data(),strlen(ba.data()));
@@ -106,11 +107,12 @@ void Dialog::setBtn()
     int buttonHeight = this->width()/16*2/3;
     int buttonX = mainWidget->x() + mainWidget->width() + 20;
     QFont btnFont;
-    btnFont.setPointSize(14);
-
+    if(this->height() == 1080)
+        btnFont.setPointSize(14);
+    else
+        btnFont.setPointSize(10);
 
     btnPlay->setText("播放视频");
-   // playFont.set
     btnPlay->setFont(btnFont);
     btnPlay->setStyleSheet("background-color:#76B900;"
                            "color:#ffffff;"
@@ -141,42 +143,45 @@ void Dialog::setBtn()
     connect(btnBack,&QPushButton::clicked,mainWidget,&fileWidget::onClickedBtnBack);
 
     btnQuit->setStyleSheet("border-image:url(:/quit.png)");
-    btnQuit->move(1870,30);
+    btnQuit->move(this->width()-30-(titleLb->height()/2 -15),titleLb->height()/2 -15);
     btnQuit->resize(30,30);
-   // btnQuit->setIcon(QIcon(":/quit.png"));
     connect(btnQuit,&QPushButton::clicked,this,&Dialog::close);
-
 
 }
 
-void Dialog::setMainWidget()
+void Dialog::setFileWidget()
 {
     mainWidget = new fileWidget(this);
     mainWidget->setGeometry((this->width()/2 - this->height()/9*7/2),(this->height()/2 - this->height()/9*7/2),this->height()/9*7,this->height()/9*7);
 
 }
 
+void Dialog::setPlayWidget()
+{
+   // p = new playWidget(this);
+    p.setGeometry(0,0,this->width(),this->height());
+    p.server = this->server;
+    //p->close();
+}
+
 void Dialog::setUi()
 {   
     server = new Server(this);
-    p.server = this->server;
 
     QDesktopWidget *desktopWidget = QApplication::desktop();
-    qDebug() << desktopWidget->screenGeometry();
     this->setGeometry(desktopWidget->screenGeometry());
 
 
     this->setWindowFlags(Qt::WindowStaysOnTopHint|//置顶
                          Qt::X11BypassWindowManagerHint|//兼容x11环境
                          Qt::FramelessWindowHint);//去掉边框
-
     this->setAttribute(Qt::WA_TranslucentBackground);
 
     //主要参照物
-    setMainWidget();
+    setFileWidget();
 
     setupShadowBox();
     setBtn();
-
+    setPlayWidget();
 
 }

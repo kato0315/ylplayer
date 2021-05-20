@@ -66,7 +66,7 @@ void playWidget::closeEvent(QCloseEvent *event)
 void playWidget::setWidgetUi()
 {
 
-    this->setFixedSize(1920,1080);
+    //this->setFixedSize(1920,1080);
     this->setWindowFlags(Qt::WindowStaysOnTopHint|//置顶
                          Qt::X11BypassWindowManagerHint|//兼容x11环境
                          Qt::FramelessWindowHint);//去掉边框
