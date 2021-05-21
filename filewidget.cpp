@@ -5,6 +5,18 @@ fileWidget::fileWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::fileWidget)
 {
+
+    uiInit();
+    ui->setupUi(this);
+}
+
+fileWidget::fileWidget(int width,int height,QWidget *parent):
+    QWidget(parent),
+    ui(new Ui::fileWidget)
+{
+    this->setFixedSize(width,height);
+
+
     uiInit();
     ui->setupUi(this);
 }
@@ -121,24 +133,27 @@ void fileWidget::setBackground()
     fileTitle = new QLabel(this);
     fileTitle->setFont(titleFont);
     fileTitle->setText("所有视频");
-    fileTitle->move(50,50);
-    fileTitle->resize(300,30);
+    fileTitle->move(x_position,50);
+    fileTitle->resize(sa_width,30);
     fileTitle->setStyleSheet("color:#ffffff");
 
     dirTitle = new QLabel(this);
     dirTitle->setFont(titleFont);
     dirTitle->setText("文件夹");
-    dirTitle->move(50,390);
-    dirTitle->resize(300,30);
+    dirTitle->move(x_position,390);
+    dirTitle->resize(sa_width,30);
     dirTitle->setStyleSheet("color:#ffffff");
 }
 
 //设置文件显示框
 void fileWidget::setFileArea()
 {
+
     fileSa = new QScrollArea(this);
     fileSa->setStyleSheet("background-color:#32363b;");
-    fileSa->setGeometry(50,80,700,300);
+    fileSa->setFixedSize(sa_width,sa_height);
+    fileSa->move(x_position,80);
+    //fileSa->setGeometry(50,80,this->width()/7*6,this->width()/7*6/5*2);
     fileSa->verticalScrollBar();//垂直拖动条
     fileSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -156,7 +171,9 @@ void fileWidget::setDirArea()
 {
     dirSa = new QScrollArea(this);
     dirSa->setStyleSheet("background-color:#32363b;");
-    dirSa->setGeometry(50,420,700,300);
+    dirSa->setFixedSize(sa_width,sa_height);
+    dirSa->move(x_position,420);
+    //dirSa->setGeometry(50,420,700,300);
     dirSa->verticalScrollBar();//垂直拖动条
     dirSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -177,8 +194,8 @@ void fileWidget::setPathArea()
     dirFont.setPointSize(18);
     videoPathLb = new QLabel(this);
     videoPathLb->setFont(dirFont);
-    videoPathLb->move(50,730);
-    videoPathLb->resize(700,50);
+    videoPathLb->move(x_position,730);
+    videoPathLb->resize(sa_width,50);
     videoPathLb->setStyleSheet("background-color:#212326;color:#ffffff;");
 
 }
@@ -337,9 +354,13 @@ void fileWidget::changeCurrentDir(QString dirString)
 
 void fileWidget::uiInit()
 {
-    setBackground();
+    sa_width = this->width()/7*6;
+    sa_height = this->width()/7*6/5*2;
+    x_position = (this->width()-sa_width)/2;
     setFileArea();
     setDirArea();
+    setBackground();
+
     setPathArea();
 
     changeCurrentDir(default_path);

@@ -151,9 +151,11 @@ void Dialog::setBtn()
 
 void Dialog::setFileWidget()
 {
-    mainWidget = new fileWidget(this);
-    mainWidget->setGeometry((this->width()/2 - this->height()/9*7/2),(this->height()/2 - this->height()/9*7/2),this->height()/9*7,this->height()/9*7);
+    //mainWidget = new fileWidget(this);
+   // mainWidget->setGeometry((this->width()/2 - this->height()/9*7/2),(this->height()/2 - this->height()/9*7/2),this->height()/9*7,this->height()/9*7);
 
+    mainWidget = new fileWidget(this->height()/9*7,this->height()/9*7,this);
+    mainWidget->move((this->width()/2 - this->height()/9*7/2),(this->height()/2 - this->height()/9*7/2));
 }
 
 void Dialog::setPlayWidget()

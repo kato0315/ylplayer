@@ -34,6 +34,7 @@ class fileWidget : public QWidget
 
 public:
     explicit fileWidget(QWidget *parent = nullptr);
+    fileWidget(int width,int height,QWidget *parent);
     ~fileWidget();
 
     QAbstractButton* getCheckedButton();
@@ -51,6 +52,9 @@ public slots:
 private:
     Ui::fileWidget *ui;
 
+    int sa_width;
+    int sa_height;
+    int x_position;//左侧位置对齐
 
     QLabel* fileTitle;
     QLabel* dirTitle;
