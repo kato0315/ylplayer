@@ -55,6 +55,7 @@ private:
     int sa_width;
     int sa_height;
     int x_position;//左侧位置对齐
+    int interval_height;
 
     QLabel* fileTitle;
     QLabel* dirTitle;

@@ -34,12 +34,7 @@ QString fileWidget::getCurrentDirPath()
 //槽函数
 void fileWidget::onDoubleClickedButton(QString text)
 {
-    //qDebug() << text <<endl;
-    //获取更换的路径
-   // QString changePath = currentDir->path() +"/" +((QToolButton*)sender())->text();
     changeCurrentDir(text);
-
-
 }
 
 void fileWidget::onClickedBtnAdd()
@@ -123,25 +118,21 @@ void fileWidget::paintEvent(QPaintEvent *)
 //设置基本布局
 void fileWidget::setBackground()
 {
-    //this->setFixedSize(800,800);
-    QPoint globalpos = this->mapToGlobal(QPoint(0,0));//取父窗口的坐标
-    this->move(globalpos.x()+560,globalpos.y()+160);
-
     QFont titleFont;
-    titleFont.setPointSize(20);
+    titleFont.setPointSize(interval_height-10);
 
     fileTitle = new QLabel(this);
     fileTitle->setFont(titleFont);
     fileTitle->setText("所有视频");
-    fileTitle->move(x_position,50);
-    fileTitle->resize(sa_width,30);
+    fileTitle->move(x_position,interval_height);
+    fileTitle->resize(sa_width,interval_height);
     fileTitle->setStyleSheet("color:#ffffff");
 
     dirTitle = new QLabel(this);
     dirTitle->setFont(titleFont);
     dirTitle->setText("文件夹");
-    dirTitle->move(x_position,390);
-    dirTitle->resize(sa_width,30);
+    dirTitle->move(x_position,interval_height*3+sa_height);
+    dirTitle->resize(sa_width,interval_height);
     dirTitle->setStyleSheet("color:#ffffff");
 }
 
@@ -152,16 +143,14 @@ void fileWidget::setFileArea()
     fileSa = new QScrollArea(this);
     fileSa->setStyleSheet("background-color:#32363b;");
     fileSa->setFixedSize(sa_width,sa_height);
-    fileSa->move(x_position,80);
-    //fileSa->setGeometry(50,80,this->width()/7*6,this->width()/7*6/5*2);
+    fileSa->move(x_position,interval_height*2);
     fileSa->verticalScrollBar();//垂直拖动条
     fileSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     videoFile = new QWidget();
-   // videoFile->setGeometry(0,0,700,600);
     fileSa->setWidget(videoFile);
 
-    videoFile->setGeometry(0,0,700,300);
+    videoFile->setGeometry(0,0,sa_width,sa_height);
     fileButtonGroup = new QButtonGroup(this);
     fileButtonGroup->setExclusive(true);//设置互斥，实现单选效果
 }
@@ -172,14 +161,14 @@ void fileWidget::setDirArea()
     dirSa = new QScrollArea(this);
     dirSa->setStyleSheet("background-color:#32363b;");
     dirSa->setFixedSize(sa_width,sa_height);
-    dirSa->move(x_position,420);
+    dirSa->move(x_position,interval_height*4+sa_height);
     //dirSa->setGeometry(50,420,700,300);
     dirSa->verticalScrollBar();//垂直拖动条
     dirSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     videoDir = new QWidget();
     dirSa->setWidget(videoDir);
-    videoDir->setGeometry(0,0,700,300);
+    videoDir->setGeometry(0,0,sa_width,sa_height);
 
 
     dirButtonGroup = new QButtonGroup(this);
@@ -191,11 +180,11 @@ void fileWidget::setPathArea()
 {
     currentDir = new QDir();
     QFont dirFont;
-    dirFont.setPointSize(18);
+    dirFont.setPointSize(interval_height-10);
     videoPathLb = new QLabel(this);
     videoPathLb->setFont(dirFont);
-    videoPathLb->move(x_position,730);
-    videoPathLb->resize(sa_width,50);
+    videoPathLb->move(x_position,interval_height*5+sa_height*2);
+    videoPathLb->resize(sa_width,interval_height*1.5);
     videoPathLb->setStyleSheet("background-color:#212326;color:#ffffff;");
 
 }
@@ -237,19 +226,20 @@ void fileWidget::deleteFileButton()
 void fileWidget::createDirButton()
 {
     QFileIconProvider icon_provider;
+    int button_size=sa_width/6;
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
 
     if(dirList.size() > 10){
         //文件布局位置超出原界面则扩展原界面大小
-        videoDir->resize(700,150*(dirList.size()/5));
+        videoDir->resize(sa_width,(sa_height/2)*(dirList.size()/5 + 1));
     }
     else
-        videoDir->resize(700,300);
+        videoDir->resize(sa_width,sa_height);
 
     for(int i =0;i < dirList.size();i++){
         dirButton = new toolbutton(videoDir);
 
-        dirButton->resize(90,100);
+        dirButton->resize(button_size,button_size);
         dirButton->setIcon(icon_provider.icon(dirList.at(i)));
         dirButton->setIconSize(QSize(90,90));
         dirButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -267,7 +257,7 @@ void fileWidget::createDirButton()
         dirButton->setText(dirList.at(i).fileName());
         dirButtonGroup->addButton(dirButton);
         dirButtonGroup->setId(dirButton,i);
-        dirButton->move(15+(i%5)*135,15+((i/5)*150));
+        dirButton->move(button_size/12+(i%5)*(button_size+button_size/6),button_size/12+(i/5)*(button_size+button_size/6));
 
         connect(dirButton,SIGNAL(doubleClicked(QString)),this,SLOT(onDoubleClickedButton(QString)));
         dirButton->show();
@@ -279,24 +269,25 @@ void fileWidget::createFileButton()
 {
 
     QFileIconProvider icon_provider;
-
+    int button_size=sa_width/6;
     QFileInfoList filelist = currentDir->entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
     qDebug() << "file number:" << filelist.size();
 
     if(filelist.size() > 10){
         //文件布局位置超出原界面则扩展原界面大小
-        videoFile->resize(700,150*(filelist.size()/5));
+        qDebug() << "resize";
+        videoFile->resize(sa_width,(sa_height/2)*(filelist.size()/5 + 1));
     }
     else
-        videoFile->resize(700,300);
+        videoFile->resize(sa_width,sa_height);
 
     for(int i =0;i<filelist.size();i++){
 
         fileButton = new QToolButton(videoFile);
 
-        fileButton->resize(90,100);
+        fileButton->resize(button_size,button_size);
         fileButton->setIcon(icon_provider.icon(filelist.at(i)));
-        fileButton->setIconSize(QSize(90,90));
+        fileButton->setIconSize(QSize(110,90));
         fileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
         fileButton->setCheckable(true);
         fileButton->setStyleSheet("QToolButton{"
@@ -314,7 +305,7 @@ void fileWidget::createFileButton()
         fileButton->setText(filelist.at(i).fileName());
         fileButtonGroup->addButton(fileButton);
         fileButtonGroup->setId(fileButton,i);
-        fileButton->move(15+(i%5)*135,15+((i/5)*150));
+        fileButton->move(button_size/12+(i%5)*(button_size+button_size/6),button_size/12+(i/5)*(button_size+button_size/6));
         fileButton->show();
     }
 
@@ -357,6 +348,7 @@ void fileWidget::uiInit()
     sa_width = this->width()/7*6;
     sa_height = this->width()/7*6/5*2;
     x_position = (this->width()-sa_width)/2;
+    interval_height = this->width()/7/4;
     setFileArea();
     setDirArea();
     setBackground();
