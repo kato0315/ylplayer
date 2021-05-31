@@ -26,7 +26,8 @@ namespace Ui {
 class fileWidget;
 }
 
-const QString default_path = "//tsclient/LocalSpace";
+//const QString default_path = "//tsclient/LocalSpace";
+const QString default_path = "E:/work_station/mycode";
 
 class fileWidget : public QWidget
 {
@@ -40,6 +41,7 @@ public:
     QAbstractButton* getCheckedButton();
 
     QString getCurrentDirPath();
+    quint64 getDirFileSize(const QString &path);
 
 protected slots:
     void onDoubleClickedButton(QString text);

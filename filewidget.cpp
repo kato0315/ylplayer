@@ -31,6 +31,22 @@ QString fileWidget::getCurrentDirPath()
     return currentDir->path();
 }
 
+quint64 fileWidget::getDirFileSize(const QString &path)
+{
+    QDir dir(path);
+    quint64 size = 0;
+
+    foreach(QFileInfo fileInfo,dir.entryInfoList(QDir::Files)){
+        size += fileInfo.size();
+    }
+
+    foreach(QString subDir,dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot)){
+        size += getDirFileSize(path+QDir::separator()+subDir);
+    }
+
+    return size;
+}
+
 //槽函数
 void fileWidget::onDoubleClickedButton(QString text)
 {
@@ -356,6 +372,7 @@ void fileWidget::uiInit()
     setPathArea();
 
     changeCurrentDir(default_path);
+    qDebug() << getDirFileSize(default_path)/1024/1024<<"MB";
 }
 
 

@@ -161,7 +161,7 @@ void Dialog::setFileWidget()
 void Dialog::setPlayWidget()
 {
    // p = new playWidget(this);
-    p.setGeometry(0,0,this->width(),this->height());
+    //p.setGeometry(0,0,this->width(),this->height());
     p.server = this->server;
     //p->close();
 }
@@ -177,6 +177,7 @@ void Dialog::setUi()
     this->setWindowFlags(Qt::WindowStaysOnTopHint|//置顶
                          Qt::X11BypassWindowManagerHint|//兼容x11环境
                          Qt::FramelessWindowHint);//去掉边框
+
     this->setAttribute(Qt::WA_TranslucentBackground);
 
     //主要参照物
