@@ -174,8 +174,7 @@ void Dialog::setUi()
     this->setGeometry(desktopWidget->screenGeometry());
 
 
-    this->setWindowFlags(Qt::WindowStaysOnTopHint|//置顶
-                         Qt::X11BypassWindowManagerHint|//兼容x11环境
+    this->setWindowFlags(//置顶Qt::WindowStaysOnTopHint|
                          Qt::FramelessWindowHint);//去掉边框
 
     this->setAttribute(Qt::WA_TranslucentBackground);

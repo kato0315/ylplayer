@@ -31,7 +31,7 @@ QString fileWidget::getCurrentDirPath()
     return currentDir->path();
 }
 
-quint64 fileWidget::getDirFileSize(const QString &path)
+quint64 fileWidget::getDirSize(const QString &path)
 {
     QDir dir(path);
     quint64 size = 0;
@@ -41,10 +41,44 @@ quint64 fileWidget::getDirFileSize(const QString &path)
     }
 
     foreach(QString subDir,dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot)){
-        size += getDirFileSize(path+QDir::separator()+subDir);
+        size += getDirSize(path+QDir::separator()+subDir);
     }
 
     return size;
+}
+
+ QString fileWidget::translateDirSize(quint64 size)
+ {
+     double translateSize;
+     QString strSize;
+     if(size >= 1024*1024*1024){
+         translateSize = size/1024/1024/1024;
+         strSize = QString::number(translateSize,'f',1)+"GB/2.5GB";
+         return strSize;
+     }
+     else if(size >= 1024*1024){
+         translateSize = size/1024/1024;
+         strSize = QString::number(translateSize,'f',1)+"MB/2.5GB";
+         return strSize;
+     }
+     else if(size >= 1024){
+         translateSize = size/1024;
+         strSize = QString::number(translateSize,'f',1)+"KB/2.5GB";
+         return strSize;
+     }
+     else{
+         translateSize = size;
+         strSize = QString::number(translateSize,'f',1)+"B/2.5GB";
+         return strSize;
+     }
+
+
+ }
+
+void fileWidget::refreshDirSize()
+{
+    usedSpace = getDirSize(default_path);
+    fileSpace->setText(translateDirSize(usedSpace));
 }
 
 //槽函数
@@ -63,12 +97,21 @@ void fileWidget::onClickedBtnAdd()
         QFile chosenFile(fileName);
         QFileInfo chosenFileInfo(chosenFile);
 
+        if(chosenFileInfo.size() + usedSpace > limitSpace){
+            qDebug() << "空间不足";
+            QMessageBox msgBox;
+            msgBox.setText("共享文件夹空间不足，无法复制文件！");
+            msgBox.exec();
+            return;
+        }
+
         if(chosenFileInfo.path() != currentDir->path())
         {
             QString copiedFileName =currentDir->path() + "/" + chosenFileInfo.fileName();
             chosenFile.copy(copiedFileName);
             deleteFileButton();
             createFileButton();
+            refreshDirSize();
         }
         else
             //qDebug() << "same path"<<endl;
@@ -94,6 +137,7 @@ void fileWidget::onClickedBtnDelete()
         {
             qDebug() << "remove success";
             createFileButton();
+            refreshDirSize();
         }
         else
         {
@@ -141,8 +185,18 @@ void fileWidget::setBackground()
     fileTitle->setFont(titleFont);
     fileTitle->setText("所有视频");
     fileTitle->move(x_position,interval_height);
-    fileTitle->resize(sa_width,interval_height);
+    fileTitle->resize(sa_width/2,interval_height);
     fileTitle->setStyleSheet("color:#ffffff");
+
+    fileSpace = new QLabel(this);
+    fileSpace->setFont(titleFont);
+    fileSpace->move(x_position+sa_width/2,interval_height);
+    fileSpace->resize(sa_width/2,interval_height);
+    fileSpace->setStyleSheet("color:#ffffff");
+    fileSpace->setAlignment(Qt::AlignRight);
+
+
+    fileSpace->setText(translateDirSize(usedSpace));
 
     dirTitle = new QLabel(this);
     dirTitle->setFont(titleFont);
@@ -331,7 +385,7 @@ void fileWidget::createFileButton()
 void fileWidget::changeCurrentDir()
 {
     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
-    if(dirButtonGroup->button(0) != NULL | fileButtonGroup->button(0) != NULL){
+    if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
         deleteDirButton();
         deleteFileButton();
     }
@@ -347,7 +401,7 @@ void fileWidget::changeCurrentDir()
 void fileWidget::changeCurrentDir(QString dirString)
 {
     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
-    if(dirButtonGroup->button(0) != NULL | fileButtonGroup->button(0) != NULL){
+    if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
         deleteDirButton();
         deleteFileButton();
     }
@@ -365,6 +419,7 @@ void fileWidget::uiInit()
     sa_height = this->width()/7*6/5*2;
     x_position = (this->width()-sa_width)/2;
     interval_height = this->width()/7/4;
+    usedSpace =  getDirSize(default_path);
     setFileArea();
     setDirArea();
     setBackground();
@@ -372,7 +427,7 @@ void fileWidget::uiInit()
     setPathArea();
 
     changeCurrentDir(default_path);
-    qDebug() << getDirFileSize(default_path)/1024/1024<<"MB";
+
 }
 
 

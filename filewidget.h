@@ -20,14 +20,18 @@
 
 #include <QFileDialog>
 
+#include <QMessageBox>
+
 #include <toolbutton.h>
 
 namespace Ui {
 class fileWidget;
 }
 
-//const QString default_path = "//tsclient/LocalSpace";
-const QString default_path = "E:/work_station/mycode";
+const QString default_path = "//tsclient/LocalSpace";
+//const QString default_path = "E:/work_station/mycode";
+//const qint64 limitSpace = 1073741820;
+const qint64 limitSpace = 2684354560;
 
 class fileWidget : public QWidget
 {
@@ -41,7 +45,9 @@ public:
     QAbstractButton* getCheckedButton();
 
     QString getCurrentDirPath();
-    quint64 getDirFileSize(const QString &path);
+    quint64 getDirSize(const QString &path);
+    QString translateDirSize(quint64 size);
+    void refreshDirSize();
 
 protected slots:
     void onDoubleClickedButton(QString text);
@@ -61,6 +67,8 @@ private:
 
     QLabel* fileTitle;
     QLabel* dirTitle;
+    QLabel* fileSpace;
+    qint64  usedSpace;
 
     QDir* currentDir;
     QLabel* videoPathLb;
