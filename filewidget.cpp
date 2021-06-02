@@ -92,7 +92,8 @@ void fileWidget::onClickedBtnAdd()
     qDebug() << "button add" <<endl;
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("添加视频文件"),
-                                                    "E:");
+                                                    "D:/",
+                                                    tr("Videos (*.avi *.mov *.flv *.MP4)"));//rm不支持
     if(fileName != NULL){
         QFile chosenFile(fileName);
         QFileInfo chosenFileInfo(chosenFile);
@@ -269,7 +270,6 @@ QAbstractButton* fileWidget::getCheckedButton()
 void fileWidget::deleteDirButton()
 {
     QToolButton* tempbutton;
-
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
     for(int i =0;i<dirList.size();i++){
         tempbutton = (QToolButton*)dirButtonGroup->button(i);
@@ -340,7 +340,11 @@ void fileWidget::createFileButton()
 
     QFileIconProvider icon_provider;
     int button_size=sa_width/6;
-    QFileInfoList filelist = currentDir->entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
+    QDir tmpDir = *currentDir;
+    QStringList filter;
+    filter << "*.avi"<< "*.mov"<< "*.flv" << "*.MP4";   //过滤后缀名
+    tmpDir.setNameFilters(filter);
+    QFileInfoList filelist = tmpDir.entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
     qDebug() << "file number:" << filelist.size();
 
     if(filelist.size() > 10){

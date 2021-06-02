@@ -2,6 +2,7 @@
 
 Server::Server(QObject *parent) : QTcpServer(parent)
 {
+    socketFlag = false;
     listen(QHostAddress::Any,18888);
 }
 
@@ -13,7 +14,7 @@ void Server::incomingConnection(qintptr handle)
     socket = new QTcpSocket(this);
     socket->setSocketDescriptor(handle);
     connect(socket,SIGNAL(readyRead()),this,SLOT(receiveMessage()));
-
+    socketFlag = true;
 }
 
 void Server::receiveMessage()

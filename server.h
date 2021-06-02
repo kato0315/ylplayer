@@ -75,7 +75,8 @@ private slots:
 
 private:
     QTcpSocket *socket;
-
+public:
+    bool socketFlag;
 signals:
 
 };

@@ -78,17 +78,24 @@ void Dialog::onClickedBtnPlay()
     QString seturl = "play:";
 
     //QString filepath = mainWidget->getCurrentDirPath()+"/"+mainWidget->getCheckedButton()->text();
+    if(mainWidget->getCheckedButton() == 0){
+        return;
+    }
     QString filepath = "/"+mainWidget->getCheckedButton()->text();
     filepath.replace(default_path,"");
     QByteArray ba = (seturl+filepath).toUtf8();
-    printf("%s",ba.data());
+    //printf("%s",ba.data());
 
-    server->sendMessage(ba.data(),strlen(ba.data()));
+    if(server->socketFlag == true){
+        server->sendMessage(ba.data(),strlen(ba.data()));
+        p.show();
+    }
+    else{
+        QMessageBox msgBox;
+        msgBox.setText("未连接本地播放器，无法播放！");
+        msgBox.exec();
+    }
 
-    //qDebug() << "get checked button" << mainWidget->getCheckedButton()->text();
-    //QByteArray ba = mainWidget->getCheckedButton()->text().toLatin1();
-    //server.sendMessage(ba.data(),strlen(ba.data()));
-    p.show();
 
 }
 
