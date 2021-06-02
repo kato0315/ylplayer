@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>quit.png</file>
         <file>videologo.png</file>
+        <file>keyboard_guide.jpg</file>
     </qresource>
 </RCC>

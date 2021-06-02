@@ -168,7 +168,8 @@ void Dialog::setFileWidget()
 void Dialog::setPlayWidget()
 {
    // p = new playWidget(this);
-    //p.setGeometry(0,0,this->width(),this->height());
+   // p.setStyleSheet("border-image:url(:/quit.png)");
+    p.setGeometry(0,0,this->width(),this->height());
     p.server = this->server;
     //p->close();
 }

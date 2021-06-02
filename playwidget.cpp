@@ -84,5 +84,6 @@ void playWidget::setWidgetUi()
 void playWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.drawLine(QPoint(0,0),QPoint(100,100));
+    painter.drawPixmap(rect(),QPixmap(":/keyboard_guide.jpg"),QRect());
+    //painter.drawLine(QPoint(0,0),QPoint(100,100));
 }
