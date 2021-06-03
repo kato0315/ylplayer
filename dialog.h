@@ -26,6 +26,8 @@
 #include <QByteArray>
 
 #include <QDesktopWidget>
+
+#include <QTimer>
 #include "server.h"
 
 
@@ -66,7 +68,7 @@ private slots:
     void setPlayWidget();
 
     void onClickedBtnPlay();
-
+    void sendMsgSlot();
 
     void paintEvent(QPaintEvent *);
 

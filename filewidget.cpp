@@ -295,9 +295,12 @@ void fileWidget::deleteFileButton()
 //创建按钮
 void fileWidget::createDirButton()
 {
-    QFileIconProvider icon_provider;
+
     int button_size=sa_width/6;
+    //qDebug() <<button_size;
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
+    QIcon dirIcon = QIcon(":/fileIcon.png");
+
 
     if(dirList.size() > 10){
         //文件布局位置超出原界面则扩展原界面大小
@@ -310,8 +313,8 @@ void fileWidget::createDirButton()
         dirButton = new toolbutton(videoDir);
 
         dirButton->resize(button_size,button_size);
-        dirButton->setIcon(icon_provider.icon(dirList.at(i)));
-        dirButton->setIconSize(QSize(90,90));
+        dirButton->setIconSize(QSize(button_size,button_size/4*3));
+        dirButton->setIcon(dirIcon);
         dirButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
         dirButton->setCheckable(true);
         dirButton->setStyleSheet("QToolButton{"
@@ -320,9 +323,7 @@ void fileWidget::createDirButton()
                             "border-color:#76B900;"
                             "}"
 
-                            "QToolButton:checked{"
-                            "background-color:#76B900"
-                            "}");
+                                 );
 
         dirButton->setText(dirList.at(i).fileName());
         dirButtonGroup->addButton(dirButton);

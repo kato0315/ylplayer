@@ -72,23 +72,28 @@ void Dialog::setupShadowBox()
 }
 
 //按键函数
-void Dialog::onClickedBtnPlay()
-{
-    qDebug() << "test BtnPlay" <<endl;
-    QString seturl = "play:";
 
-    //QString filepath = mainWidget->getCurrentDirPath()+"/"+mainWidget->getCheckedButton()->text();
-    if(mainWidget->getCheckedButton() == 0){
-        return;
-    }
+void Dialog::sendMsgSlot()
+{
+    QString seturl = "play:";
     QString filepath = "/"+mainWidget->getCheckedButton()->text();
     filepath.replace(default_path,"");
     QByteArray ba = (seturl+filepath).toUtf8();
-    //printf("%s",ba.data());
+    server->sendMessage(ba.data(),strlen(ba.data()));
+
+}
+void Dialog::onClickedBtnPlay()
+{
+    qDebug() << "test BtnPlay" <<endl;
+
+    if(mainWidget->getCheckedButton() == 0){
+        return;
+    }
 
     if(server->socketFlag == true){
-        server->sendMessage(ba.data(),strlen(ba.data()));
         p.show();
+        QTimer::singleShot(2000,this,SLOT(sendMsgSlot()));
+
     }
     else{
         QMessageBox msgBox;

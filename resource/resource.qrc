@@ -3,5 +3,6 @@
         <file>quit.png</file>
         <file>videologo.png</file>
         <file>keyboard_guide.jpg</file>
+        <file>fileIcon.png</file>
     </qresource>
 </RCC>

@@ -67,6 +67,7 @@ class Server : public QTcpServer
 public:
     explicit Server(QObject *parent = nullptr);
 
+public slots:
     void sendMessage(char* data,int len);
 
 private slots:
