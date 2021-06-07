@@ -1,6 +1,8 @@
 #include "filewidget.h"
 #include "ui_filewidget.h"
 
+
+
 fileWidget::fileWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::fileWidget)
@@ -292,6 +294,10 @@ void fileWidget::deleteFileButton()
     }
 }
 
+
+
+
+
 //创建按钮
 void fileWidget::createDirButton()
 {
@@ -333,6 +339,12 @@ void fileWidget::createDirButton()
         connect(dirButton,SIGNAL(doubleClicked(QString)),this,SLOT(onDoubleClickedButton(QString)));
         dirButton->show();
     }
+
+}
+
+void fileWidget::getVideoPreview(QFileInfo videofile,QToolButton* fileButton)
+{
+    AVFormatContext* fmt_ctx = nullptr;
 
 }
 

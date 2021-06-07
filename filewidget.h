@@ -2,7 +2,6 @@
 #define FILEWIDGET_H
 
 #include <QWidget>
-
 #include <QToolButton>
 #include <QLabel>
 #include <QPixmap>
@@ -13,17 +12,18 @@
 #include <QDir>
 #include <QString>
 #include <QDebug>
-
 #include <QButtonGroup>
 #include <QScrollArea>
 #include <QScrollBar>
-
 #include <QFileDialog>
-
 #include <QMessageBox>
-
 #include <toolbutton.h>
 
+extern "C"
+{
+#include "libavformat/avformat.h"
+#include "libswscale/swscale.h"
+}
 
 
 namespace Ui {
@@ -98,6 +98,8 @@ private:
     void createFileButton();
     void changeCurrentDir();//后退
     void changeCurrentDir(QString dirString);
+
+    void getVideoPreview(QFileInfo videofile,QToolButton* fileButton);
 
 
 };

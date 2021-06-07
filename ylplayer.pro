@@ -4,12 +4,14 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network multimedia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ylplayer
 TEMPLATE = app
 
+INCLUDEPATH += "..\\ylplayer\\dependency\\ffmpeg-4.4-full_build-shared\\include"
+LIBS += -L..\\ylplayer\\dependency\\ffmpeg-4.4-full_build-shared\\lib -lavcodec -lavformat -lavutil -lavfilter -lswscale -lswresample
 
 SOURCES += main.cpp\
         dialog.cpp \
@@ -25,8 +27,7 @@ HEADERS  += dialog.h \
     toolbutton.h
 
 FORMS    += dialog.ui \
-    filewidget.ui \
-    playwidget.ui
+    filewidget.ui
 
 RESOURCES += \
     resource/resource.qrc
