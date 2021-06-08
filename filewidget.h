@@ -19,6 +19,8 @@
 #include <QMessageBox>
 #include <toolbutton.h>
 
+#include <QTime>
+
 extern "C"
 {
 #include "libavformat/avformat.h"
@@ -30,8 +32,8 @@ namespace Ui {
 class fileWidget;
 }
 
-const QString default_path = "//tsclient/LocalSpace";
-//const QString default_path = "E:/work_station/mycode";
+//const QString default_path = "//tsclient/LocalSpace";
+const QString default_path = "E:/work_station/mycode";
 //const qint64 limitSpace = 1073741820;
 const qint64 limitSpace = 2684354560;
 
@@ -99,7 +101,7 @@ private:
     void changeCurrentDir();//后退
     void changeCurrentDir(QString dirString);
 
-    void getVideoPreview(QFileInfo videofile,QToolButton* fileButton);
+    void getVideoPreview(QFileInfo file,QToolButton* fileButton);
 
 
 };

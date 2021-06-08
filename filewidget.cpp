@@ -342,10 +342,105 @@ void fileWidget::createDirButton()
 
 }
 
-void fileWidget::getVideoPreview(QFileInfo videofile,QToolButton* fileButton)
+void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
 {
-    AVFormatContext* fmt_ctx = nullptr;
+    QTime time;
+    time.start();
 
+    qDebug() << file.filePath();
+    AVFormatContext* fmt_ctx = nullptr;
+    int ret;
+
+    QByteArray ba = file.filePath().toUtf8();
+    ret = avformat_open_input(&fmt_ctx, ba.data(), nullptr, nullptr);
+    if (ret != 0) {
+        qDebug() << "avformat_open_input failed" << endl;
+
+    }
+
+    ret = avformat_find_stream_info(fmt_ctx,nullptr);
+    AVPacket* pkt = av_packet_alloc();
+    AVFrame* temp_frame = av_frame_alloc();
+    SwsContext* sws_ctx = nullptr;
+    QImage preview;
+    bool preview_done = false;
+    int dstW = sa_width/6;
+    int dstH = sa_width/8;
+
+    for(int i = 0; (i < fmt_ctx->nb_streams) && (!preview_done);i++){
+        //只处理视频信息
+        if(fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO){
+            AVCodec* codec = avcodec_find_decoder(fmt_ctx->streams[i]->codecpar->codec_id);
+            AVCodecContext* codec_ctx = avcodec_alloc_context3(codec);
+            avcodec_parameters_to_context(codec_ctx,fmt_ctx->streams[i]->codecpar);
+            avcodec_open2(codec_ctx,codec,nullptr);
+
+            //读取帧数据
+            while(av_read_frame(fmt_ctx,pkt) >= 0){
+                av_frame_unref(temp_frame);
+
+                //解码帧数据
+                while( (ret = avcodec_receive_frame(codec_ctx,temp_frame)) ==AVERROR(EAGAIN)){
+                    ret = avcodec_send_packet(codec_ctx,pkt);
+                    if(ret < 0){
+                        qDebug()<<"failed to send packet to decoder.";
+                        break;
+                    }
+                }
+
+                if(ret < 0 && ret != AVERROR_EOF){
+                    qDebug()<<"failed to receive packet from decoder.";
+                    continue;
+                }
+
+                //转换格式
+
+                qDebug() <<"icon width:" <<dstW <<" icon height:" << dstH;
+                sws_ctx = sws_getContext(
+                            temp_frame->width,
+                            temp_frame->height,
+                            static_cast<AVPixelFormat>(temp_frame->format),
+                            dstW,
+                            dstH,
+                            static_cast<AVPixelFormat>(AV_PIX_FMT_RGBA),
+                            SWS_FAST_BILINEAR,
+                            nullptr,
+                            nullptr,
+                            nullptr
+                            );
+                int linesize[AV_NUM_DATA_POINTERS];
+                linesize[0] = dstW*4;
+
+                //生成图片
+                preview = QImage(dstW,dstH,QImage::Format_RGBA8888);
+                uint8_t* data = preview.bits();
+                sws_scale(sws_ctx,
+                          temp_frame->data,
+                          temp_frame->linesize,
+                          0,
+                          temp_frame->height,
+                          &data,
+                          linesize);
+                sws_freeContext(sws_ctx);
+                avcodec_close(codec_ctx);
+                avcodec_free_context(&codec_ctx);
+                preview_done = true;
+                break;
+            }
+
+        }
+
+    }
+
+    av_frame_free(&temp_frame);
+    av_packet_free(&pkt);
+    avformat_close_input(&fmt_ctx);
+
+    if(preview_done){
+        fileButton->setIcon(QIcon(QPixmap::fromImage(preview)));
+        fileButton->setIconSize(QSize(dstW,dstH));
+    }
+    qDebug() <<"preview test:" <<time.elapsed()/1000.0<<"s";
 }
 
 void fileWidget::createFileButton()
@@ -373,8 +468,9 @@ void fileWidget::createFileButton()
         fileButton = new QToolButton(videoFile);
 
         fileButton->resize(button_size,button_size);
-        fileButton->setIcon(icon_provider.icon(filelist.at(i)));
-        fileButton->setIconSize(QSize(110,90));
+        getVideoPreview(filelist.at(i),fileButton);
+        //fileButton->setIcon(icon_provider.icon(filelist.at(i)));
+       // fileButton->setIconSize(QSize(110,90));
         fileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
         fileButton->setCheckable(true);
         fileButton->setStyleSheet("QToolButton{"

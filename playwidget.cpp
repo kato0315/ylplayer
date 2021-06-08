@@ -1,9 +1,8 @@
 #include "playwidget.h"
-#include "ui_playwidget.h"
+//#include "ui_playwidget.h"
 
 playWidget::playWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::playWidget)
+    QWidget(parent)
 {
     quit = false;
     setWidgetUi();
@@ -12,7 +11,7 @@ playWidget::playWidget(QWidget *parent) :
 
 playWidget::~playWidget()
 {
-    delete ui;
+    //delete ui;
 }
 
 
