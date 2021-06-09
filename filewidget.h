@@ -6,7 +6,6 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QFileInfo>
-#include <QFileIconProvider>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QDir>
@@ -18,6 +17,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <toolbutton.h>
+#include <QTextBrowser>
 
 #include <QTime>
 
@@ -55,6 +55,8 @@ public:
 
 protected slots:
     void onDoubleClickedButton(QString text);
+    void enteredFileButton();
+    void leftFileButton();
 public slots:
     void onClickedBtnAdd();
     void onClickedBtnDelete();
@@ -86,6 +88,8 @@ private:
     QButtonGroup* fileButtonGroup;
     toolbutton* dirButton;
     QButtonGroup* dirButtonGroup;
+
+    QTextBrowser fileInfoText;
 
     void paintEvent(QPaintEvent*);
     void setBackground();

@@ -14,8 +14,12 @@ public:
     ~toolbutton();
 signals:
     void doubleClicked(QString);
+    void enterButton();
+    void leaveButton();
 protected:
     void mouseDoubleClickEvent(QMouseEvent *ev);
+    void enterEvent(QEvent *);
+    void leaveEvent(QEvent *);
 };
 
 #endif // TOOLBUTTON_H

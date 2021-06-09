@@ -89,6 +89,19 @@ void fileWidget::onDoubleClickedButton(QString text)
     changeCurrentDir(text);
 }
 
+void fileWidget::enteredFileButton()
+{
+    qDebug() << "enter file button:";
+    fileInfoText.move(0,0);
+    fileInfoText.show();
+}
+
+void fileWidget::leftFileButton()
+{
+    qDebug() << "left file button";
+    fileInfoText.close();
+}
+
 void fileWidget::onClickedBtnAdd()
 {
     qDebug() << "button add" <<endl;
@@ -376,9 +389,11 @@ void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
             avcodec_open2(codec_ctx,codec,nullptr);
 
             //读取帧数据
+            av_seek_frame(fmt_ctx,-1,5*AV_TIME_BASE,AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
             while(av_read_frame(fmt_ctx,pkt) >= 0){
                 av_frame_unref(temp_frame);
-
+                qDebug() << "pkt pos" << pkt->pos;
+                qDebug() << "pkt duration" <<pkt->duration;
                 //解码帧数据
                 while( (ret = avcodec_receive_frame(codec_ctx,temp_frame)) ==AVERROR(EAGAIN)){
                     ret = avcodec_send_packet(codec_ctx,pkt);
@@ -446,7 +461,6 @@ void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
 void fileWidget::createFileButton()
 {
 
-    QFileIconProvider icon_provider;
     int button_size=sa_width/6;
     QDir tmpDir = *currentDir;
     QStringList filter;
@@ -465,12 +479,10 @@ void fileWidget::createFileButton()
 
     for(int i =0;i<filelist.size();i++){
 
-        fileButton = new QToolButton(videoFile);
+        fileButton = new toolbutton(videoFile);
 
         fileButton->resize(button_size,button_size);
         getVideoPreview(filelist.at(i),fileButton);
-        //fileButton->setIcon(icon_provider.icon(filelist.at(i)));
-       // fileButton->setIconSize(QSize(110,90));
         fileButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
         fileButton->setCheckable(true);
         fileButton->setStyleSheet("QToolButton{"
@@ -489,6 +501,9 @@ void fileWidget::createFileButton()
         fileButtonGroup->addButton(fileButton);
         fileButtonGroup->setId(fileButton,i);
         fileButton->move(button_size/12+(i%5)*(button_size+button_size/6),button_size/12+(i/5)*(button_size+button_size/6));
+
+        connect(fileButton,SIGNAL(enterButton()),this,SLOT(enteredFileButton()));
+        connect(fileButton,SIGNAL(leaveButton()),this,SLOT(leftFileButton()));
         fileButton->show();
     }
 
@@ -533,6 +548,9 @@ void fileWidget::uiInit()
     x_position = (this->width()-sa_width)/2;
     interval_height = this->width()/7/4;
     usedSpace =  getDirSize(default_path);
+    fileInfoText.setText("1234321");
+    fileInfoText.setWindowFlags(Qt::FramelessWindowHint);
+
     setFileArea();
     setDirArea();
     setBackground();

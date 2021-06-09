@@ -17,6 +17,17 @@ void toolbutton::mouseDoubleClickEvent(QMouseEvent *ev)
         //qDebug() << "double click test";
         emit doubleClicked(this->text());
     }
-
-
 }
+
+void toolbutton::enterEvent(QEvent *)
+{
+    //qDebug() << "鼠标移入按键";
+    emit enterButton();
+}
+
+void toolbutton::leaveEvent(QEvent *)
+{
+    //qDebug() << "鼠标移出按键";
+    emit leaveButton();
+}
+
