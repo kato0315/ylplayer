@@ -33,7 +33,7 @@ class fileWidget;
 }
 
 //const QString default_path = "//tsclient/LocalSpace";
-const QString default_path = "E:/work_station/mycode";
+const QString default_path = "E:/work_station/testvideo";
 //const qint64 limitSpace = 1073741820;
 const qint64 limitSpace = 2684354560;
 
@@ -55,8 +55,10 @@ public:
 
 protected slots:
     void onDoubleClickedButton(QString text);
-    void enteredFileButton();
-    void leftFileButton();
+    void enteredFileButton(QString text);
+    void enteredDirButton(QString text);
+    void leftButton();
+
 public slots:
     void onClickedBtnAdd();
     void onClickedBtnDelete();
@@ -90,12 +92,14 @@ private:
     QButtonGroup* dirButtonGroup;
 
     QTextBrowser fileInfoText;
+    QLabel fileInfoLabel;
 
     void paintEvent(QPaintEvent*);
     void setBackground();
     void setDirArea();
     void setFileArea();
     void setPathArea();
+    void setFileInfoText();
     void uiInit();
 
     void deleteDirButton();

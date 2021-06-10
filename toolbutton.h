@@ -14,7 +14,7 @@ public:
     ~toolbutton();
 signals:
     void doubleClicked(QString);
-    void enterButton();
+    void enterButton(QString);
     void leaveButton();
 protected:
     void mouseDoubleClickEvent(QMouseEvent *ev);
