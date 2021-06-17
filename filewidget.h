@@ -17,10 +17,13 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <toolbutton.h>
-#include <QTextBrowser>
 
 #include <QTime>
+#include <QFileSystemWatcher>
+#include <Shlwapi.h>
 
+
+using namespace std;
 extern "C"
 {
 #include "libavformat/avformat.h"
@@ -32,9 +35,9 @@ namespace Ui {
 class fileWidget;
 }
 
-//const QString default_path = "//tsclient/LocalSpace";
-const QString default_path = "E:/work_station/testvideo";
-//const qint64 limitSpace = 1073741820;
+const QString default_path = "//tsclient/LocalSpace";
+//const QString default_path = "E:/work_station/testvideo";
+
 const qint64 limitSpace = 2684354560;
 
 class fileWidget : public QWidget
@@ -59,6 +62,8 @@ protected slots:
     void enteredDirButton(QString text);
     void leftButton();
 
+    void refreshButtonInterface();
+
 public slots:
     void onClickedBtnAdd();
     void onClickedBtnDelete();
@@ -78,6 +83,7 @@ private:
     QLabel* fileSpace;
     qint64  usedSpace;
 
+    QFileSystemWatcher* fileWatcher;
     QDir* currentDir;
     QLabel* videoPathLb;
 
@@ -91,8 +97,10 @@ private:
     toolbutton* dirButton;
     QButtonGroup* dirButtonGroup;
 
-    QTextBrowser fileInfoText;
+    SHFILEOPSTRUCT fileOp;
     QLabel fileInfoLabel;
+
+
 
     void paintEvent(QPaintEvent*);
     void setBackground();
@@ -100,13 +108,14 @@ private:
     void setFileArea();
     void setPathArea();
     void setFileInfoText();
+    void setFileOp();
     void uiInit();
 
     void deleteDirButton();
     void deleteFileButton();
     void createDirButton();
     void createFileButton();
-    void changeCurrentDir();//后退
+    void changeCurrentDir();
     void changeCurrentDir(QString dirString);
 
     void getVideoPreview(QFileInfo file,QToolButton* fileButton);

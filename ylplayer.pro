@@ -10,9 +10,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ylplayer
 TEMPLATE = app
 
+
 INCLUDEPATH += "..\\ylplayer\\dependency\\ffmpeg-4.4-full_build-shared\\include"
 LIBS += -L..\\ylplayer\\dependency\\ffmpeg-4.4-full_build-shared\\lib -lavcodec -lavformat -lavutil -lavfilter -lswscale -lswresample
-
+LIBS += -lshlwapi
 SOURCES += main.cpp\
         dialog.cpp \
     filewidget.cpp \

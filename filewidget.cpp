@@ -7,7 +7,6 @@ fileWidget::fileWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::fileWidget)
 {
-
     uiInit();
     ui->setupUi(this);
 }
@@ -23,14 +22,16 @@ fileWidget::fileWidget(int width,int height,QWidget *parent):
 
 fileWidget::~fileWidget()
 {
+    fileInfoLabel.close();
     delete ui;
 }
 
+//获取目录路径
 QString fileWidget::getCurrentDirPath()
 {
     return currentDir->path();
 }
-
+//获取目录大小
 quint64 fileWidget::getDirSize(const QString &path)
 {
     QDir dir(path);
@@ -81,14 +82,16 @@ void fileWidget::refreshDirSize()
 }
 
 //槽函数
+//双击文件夹切换目录
 void fileWidget::onDoubleClickedButton(QString text)
 {
     changeCurrentDir(text);
 }
 
+//鼠标指针指向文件时显示文件信息
 void fileWidget::enteredFileButton(QString text)
 {
-    qDebug() << "enter file button:" <<text;
+  //  qDebug() << "enter file button:" <<text;
     QFileInfo chosenFile;
     QDir tmpDir = *currentDir;
     QStringList filter;
@@ -116,17 +119,12 @@ void fileWidget::enteredFileButton(QString text)
     fileInfoLabel.show();
 }
 
-
-
-
+//鼠标指针指向文件夹时显示文件夹名
 void fileWidget::enteredDirButton(QString text)
 {
-    qDebug() << "enter dir button:" <<text;
     QFileInfo chosenFile;
     QDir tmpDir = *currentDir;
-
     int i;
-
     QFileInfoList filelist = tmpDir.entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
 
     for(i =0;i<filelist.size();i++){
@@ -146,19 +144,29 @@ void fileWidget::enteredDirButton(QString text)
     fileInfoLabel.show();
 }
 
+//鼠标指针离开文件或文件夹时关闭显示的label
 void fileWidget::leftButton()
 {
-    qDebug() << "left button";
+    //qDebug() << "left button";
     fileInfoLabel.close();
 }
 
+//文件数量变动时刷新按钮
+ void fileWidget::refreshButtonInterface()
+ {
+     deleteFileButton();
+     createFileButton();
+     refreshDirSize();
+ }
+
+//添加文件按钮实现复制功能
 void fileWidget::onClickedBtnAdd()
 {
     qDebug() << "button add" <<endl;
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("添加视频文件"),
-                                                    "D:/",
-                                                    tr("Videos (*.avi *.mov *.flv *.MP4)"));//rm不支持
+                                                    "E:/work_station/testvideo");
+                                                    //tr("Videos (*.avi *.mov *.flv *.MP4)"));//rm不支持
     if(fileName != NULL){
         QFile chosenFile(fileName);
         QFileInfo chosenFileInfo(chosenFile);
@@ -174,13 +182,23 @@ void fileWidget::onClickedBtnAdd()
         if(chosenFileInfo.path() != currentDir->path())
         {
             QString copiedFileName =currentDir->path() + "/" + chosenFileInfo.fileName();
-            chosenFile.copy(copiedFileName);
-            deleteFileButton();
-            createFileButton();
-            refreshDirSize();
+            //需要将/改为\\才能识别
+            fileName.replace(QRegExp("\\/"),"\\");
+            copiedFileName.replace(QRegExp("\\/"),"\\");
+
+            wstring pFrom = fileName.toStdWString();
+            wstring pTo = copiedFileName.toStdWString();
+            //扩大wstring空间，保证字符串末端必定为\0
+            pFrom.resize(pFrom.size()+2);
+            pTo.resize(pTo.size()+2);
+            fileOp.pFrom = pFrom.c_str();
+            fileOp.pTo = pTo.c_str();
+            int ret = 0;
+            ret =SHFileOperation(&fileOp);
+            qDebug() <<"SHFileOp:"<< ret;
         }
         else
-            //qDebug() << "same path"<<endl;
+            qDebug() << "same path"<<endl;
             return;
 
     }
@@ -188,6 +206,7 @@ void fileWidget::onClickedBtnAdd()
         qDebug() << "quit" <<endl;
 }
 
+//删除按钮实现文件删除功能
 void fileWidget::onClickedBtnDelete()
 {
     qDebug() << "button delete" <<endl;
@@ -197,18 +216,14 @@ void fileWidget::onClickedBtnDelete()
         QString deleteFileName = currentDir->path() + "/" +getCheckedButton()->text();
         QFile deleteFile(deleteFileName);
 
-        deleteFileButton();
-
         if(deleteFile.remove())
         {
             qDebug() << "remove success";
-            createFileButton();
             refreshDirSize();
         }
         else
         {
             qDebug() << "remove fail";
-            createFileButton();
             return;
         }
 
@@ -218,11 +233,11 @@ void fileWidget::onClickedBtnDelete()
 
 }
 
+//后退键实现切换上级目录功能
 void fileWidget::onClickedBtnBack()
 {
 
     if(currentDir->path() != default_path){
-
         changeCurrentDir();
     }
     else
@@ -238,7 +253,6 @@ void fileWidget::paintEvent(QPaintEvent *)
     mainPainter.setPen(pen1);
     mainPainter.setBrush(brush);
     mainPainter.drawRect(QRect(0,0,this->width(),this->height()));
-
 }
 
 //设置基本布局
@@ -357,11 +371,7 @@ void fileWidget::deleteFileButton()
     }
 }
 
-
-
-
-
-//创建按钮
+//创建文件夹按钮
 void fileWidget::createDirButton()
 {
 
@@ -407,6 +417,7 @@ void fileWidget::createDirButton()
 
 }
 
+//获取视频文件预览图
 void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
 {
     QTime time;
@@ -435,7 +446,7 @@ void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
     int dstW = sa_width/6;
     int dstH = sa_width/8;
 
-    for(int i = 0; (i < fmt_ctx->nb_streams) && (!preview_done);i++){
+    for(unsigned int i = 0;(i < fmt_ctx->nb_streams) && (!preview_done);i++){
         //只处理视频信息
         if(fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO){
             AVCodec* codec = avcodec_find_decoder(fmt_ctx->streams[i]->codecpar->codec_id);
@@ -511,6 +522,7 @@ void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
     qDebug() <<"preview test:" <<time.elapsed()/1000.0<<"s";
 }
 
+//创建文件按钮
 void fileWidget::createFileButton()
 {
 
@@ -562,9 +574,13 @@ void fileWidget::createFileButton()
 
 }
 
-//更换目录
+//更换目录,回到上级目录
 void fileWidget::changeCurrentDir()
 {
+    if(currentDir->exists()){
+      fileWatcher->removePath(currentDir->path());
+    }
+
     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
     if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
         deleteDirButton();
@@ -572,15 +588,21 @@ void fileWidget::changeCurrentDir()
     }
     //修改路径
     currentDir->cdUp();
+    fileWatcher->addPath(currentDir->path());
+    qDebug() << fileWatcher->files();
     videoPathLb->setText(currentDir->path());
     //创建新路径中的文件按钮
     createDirButton();
     createFileButton();
 
 }
-
+//更换目录
 void fileWidget::changeCurrentDir(QString dirString)
 {
+    if(currentDir->exists()){
+      fileWatcher->removePath(currentDir->path());
+    }
+
     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
     if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
         deleteDirButton();
@@ -588,20 +610,26 @@ void fileWidget::changeCurrentDir(QString dirString)
     }
     //修改路径
     currentDir->cd(dirString);
+    fileWatcher->addPath(currentDir->path());
+    qDebug() << fileWatcher->files();
     videoPathLb->setText(currentDir->path());
     //创建新路径中的文件按钮
     createDirButton();
     createFileButton();
 }
 
+
 void fileWidget::setFileInfoText()
 {
-  /*  fileInfoText.setText("1234321");
-    fileInfoText.adjustSize();
-    fileInfoText.setWindowFlags(Qt::FramelessWindowHint);
-    fileInfoText.setMinimumSize(0,0);*/
     fileInfoLabel.setWindowFlag(Qt::FramelessWindowHint);
 }
+
+ void fileWidget::setFileOp()
+ {
+     fileOp.hwnd = GetDesktopWindow();
+     fileOp.wFunc = FO_COPY;
+     //fileOp.fFlags = FOF_NOCONFIRMATION;
+ }
 
 void fileWidget::uiInit()
 {
@@ -611,15 +639,18 @@ void fileWidget::uiInit()
     interval_height = this->width()/7/4;
     usedSpace =  getDirSize(default_path);
 
+    setFileOp();
     setFileInfoText();
     setFileArea();
     setDirArea();
     setBackground();
-
     setPathArea();
 
-    changeCurrentDir(default_path);
+    //fileWatcher用于监视当前目录的文件信息，当更换目录或目录内文件数量变化时刷新界面，改变相应的按钮
+    fileWatcher = new QFileSystemWatcher();
+    connect(fileWatcher,SIGNAL(directoryChanged(QString)),this,SLOT(refreshButtonInterface()));
 
+    changeCurrentDir(default_path);
 }
 
 
