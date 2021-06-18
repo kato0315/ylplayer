@@ -165,8 +165,8 @@ void fileWidget::onClickedBtnAdd()
     qDebug() << "button add" <<endl;
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("添加视频文件"),
-                                                    "E:/work_station/testvideo");
-                                                    //tr("Videos (*.avi *.mov *.flv *.MP4)"));//rm不支持
+                                                    "D:",
+                                                    tr("Videos (*.avi *.mov *.flv *.MP4)"));//rm不支持
     if(fileName != NULL){
         QFile chosenFile(fileName);
         QFileInfo chosenFileInfo(chosenFile);
@@ -362,11 +362,11 @@ void fileWidget::deleteFileButton()
     QToolButton* tempbutton;
 
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
-    qDebug() << currentDir->path();
-    qDebug() << "delete file number:" << dirList.size();
+    //qDebug() << currentDir->path();
+    //qDebug() << "delete file number:" << dirList.size();
     for(int i =0;i<dirList.size();i++){
         tempbutton = (QToolButton*)fileButtonGroup->button(i);
-        qDebug() <<"delete button"<<endl;
+        //qDebug() <<"delete button"<<endl;
         delete tempbutton;
     }
 }
@@ -420,8 +420,8 @@ void fileWidget::createDirButton()
 //获取视频文件预览图
 void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
 {
-    QTime time;
-    time.start();
+    //QTime time;
+    //time.start();
 
     AVFormatContext* fmt_ctx = nullptr;
     int ret;
@@ -474,7 +474,7 @@ void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
 
                 //转换格式
 
-                qDebug() <<"icon width:" <<dstW <<" icon height:" << dstH;
+               // qDebug() <<"icon width:" <<dstW <<" icon height:" << dstH;
                 sws_ctx = sws_getContext(
                             temp_frame->width,
                             temp_frame->height,
@@ -519,7 +519,7 @@ void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
         fileButton->setIcon(QIcon(QPixmap::fromImage(preview)));
         fileButton->setIconSize(QSize(dstW,dstH));
     }
-    qDebug() <<"preview test:" <<time.elapsed()/1000.0<<"s";
+    //qDebug() <<"preview test:" <<time.elapsed()/1000.0<<"s";
 }
 
 //创建文件按钮

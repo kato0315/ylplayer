@@ -121,6 +121,8 @@ void Dialog::setBtn()
     QFont btnFont;
     if(this->height() == 1080)
         btnFont.setPointSize(14);
+    else if(this->height() == 900)
+        btnFont.setPointSize(12);
     else
         btnFont.setPointSize(10);
 
