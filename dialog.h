@@ -77,6 +77,7 @@ public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
 
+    void showDialog();
 
 
 
