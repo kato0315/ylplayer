@@ -61,7 +61,7 @@ void Dialog::setupShadowBox()
     shadowBox->move(0,0);
     shadowBox->resize(this->width(),this->height());
     shadowBox->lower();
-
+/*
     videoLogo = new QWidget(this);
     videoLogo->setStyleSheet("QWidget{background-color:rgb(255,255,255);"
                              "border-image:url(:/videologo.png)"
@@ -69,6 +69,7 @@ void Dialog::setupShadowBox()
 
     videoLogo->resize(this->width()/16*2,this->width()/16*2);
     videoLogo->move(mainWidget->x()-videoLogo->width()-20,mainWidget->y());
+    */
 }
 
 //按键函数

@@ -5,12 +5,15 @@ playWidget::playWidget(QWidget *parent) :
     QWidget(parent)
 {
     quit = false;
+    volumeControl = new SystemVolume;
     setWidgetUi();
     //ui->setupUi(this);
+    qDebug() << "volume:"<< volumeControl->GetVolume();
 }
 
 playWidget::~playWidget()
 {
+    volumeControl->Close();
     //delete ui;
 }
 

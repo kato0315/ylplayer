@@ -11,7 +11,10 @@
 #include <QPaintEvent>
 #include <QPainter>
 
-#include <server.h>
+#include "server.h"
+#include "systemvolume.h"
+
+using namespace SystemConf;
 
 namespace Ui {
 class playWidget;
@@ -41,7 +44,7 @@ private:
     char cmd[1024];
     bool quit;
 
-
+    SystemVolume* volumeControl;
 
 
 
