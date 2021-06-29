@@ -45,6 +45,7 @@ private:
     bool quit;
 
     SystemVolume* volumeControl;
+    int currentVolume;
 
 
 

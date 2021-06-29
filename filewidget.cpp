@@ -22,7 +22,7 @@ fileWidget::fileWidget(int width,int height,QWidget *parent):
 
 fileWidget::~fileWidget()
 {
-    fileInfoLabel.close();
+
     delete ui;
 }
 
@@ -86,6 +86,7 @@ void fileWidget::refreshDirSize()
 void fileWidget::onDoubleClickedButton(QString text)
 {
     changeCurrentDir(text);
+    fileInfoLabel.close();
 }
 
 //鼠标指针指向文件时显示文件信息
@@ -196,6 +197,8 @@ void fileWidget::onClickedBtnAdd()
             int ret = 0;
             ret =SHFileOperation(&fileOp);
             qDebug() <<"SHFileOp:"<< ret;
+            if(ret == 0)
+                refreshButtonInterface();
         }
         else
             qDebug() << "same path"<<endl;
@@ -219,6 +222,7 @@ void fileWidget::onClickedBtnDelete()
         if(deleteFile.remove())
         {
             qDebug() << "remove success";
+            refreshButtonInterface();
             refreshDirSize();
         }
         else
@@ -348,25 +352,29 @@ QAbstractButton* fileWidget::getCheckedButton()
 //更换目录时释放原有的按钮
 void fileWidget::deleteDirButton()
 {
+    /*
     QToolButton* tempbutton;
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
     for(int i =0;i<dirList.size();i++){
         tempbutton = (QToolButton*)dirButtonGroup->button(i);
         delete tempbutton; 
+    }*/
+    foreach(QAbstractButton *tempbutton,dirButtonGroup->buttons()){
+        delete tempbutton;
     }
 }
 
 
 void fileWidget::deleteFileButton()
 {
+    /*
     QToolButton* tempbutton;
-
     QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
-    //qDebug() << currentDir->path();
-    //qDebug() << "delete file number:" << dirList.size();
     for(int i =0;i<dirList.size();i++){
         tempbutton = (QToolButton*)fileButtonGroup->button(i);
-        //qDebug() <<"delete button"<<endl;
+        delete tempbutton;
+    }*/
+    foreach(QAbstractButton *tempbutton,fileButtonGroup->buttons()){
         delete tempbutton;
     }
 }
@@ -577,9 +585,10 @@ void fileWidget::createFileButton()
 //更换目录,回到上级目录
 void fileWidget::changeCurrentDir()
 {
+    /*
     if(currentDir->exists()){
       fileWatcher->removePath(currentDir->path());
-    }
+    }*/
 
     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
     if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
@@ -588,8 +597,8 @@ void fileWidget::changeCurrentDir()
     }
     //修改路径
     currentDir->cdUp();
-    fileWatcher->addPath(currentDir->path());
-    qDebug() << fileWatcher->files();
+    /*fileWatcher->addPath(currentDir->path());
+    qDebug() << fileWatcher->files();*/
     videoPathLb->setText(currentDir->path());
     //创建新路径中的文件按钮
     createDirButton();
@@ -599,10 +608,11 @@ void fileWidget::changeCurrentDir()
 //更换目录
 void fileWidget::changeCurrentDir(QString dirString)
 {
+    /*
     if(currentDir->exists()){
       fileWatcher->removePath(currentDir->path());
     }
-
+*/
     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
     if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
         deleteDirButton();
@@ -610,8 +620,13 @@ void fileWidget::changeCurrentDir(QString dirString)
     }
     //修改路径
     currentDir->cd(dirString);
-    fileWatcher->addPath(currentDir->path());
-    qDebug() << fileWatcher->files();
+    qDebug()<< currentDir->path();
+
+    /*
+    bool test = fileWatcher->addPath(currentDir->path());
+    qDebug() << test;
+    qDebug() << fileWatcher->directories();
+*/
     videoPathLb->setText(currentDir->path());
     //创建新路径中的文件按钮
     createDirButton();
@@ -647,8 +662,8 @@ void fileWidget::uiInit()
     setPathArea();
 
     //fileWatcher用于监视当前目录的文件信息，当更换目录或目录内文件数量变化时刷新界面，改变相应的按钮
-    fileWatcher = new QFileSystemWatcher();
-    connect(fileWatcher,SIGNAL(directoryChanged(QString)),this,SLOT(refreshButtonInterface()));
+    //fileWatcher = new QFileSystemWatcher();
+    //connect(fileWatcher,SIGNAL(directoryChanged(QString)),this,SLOT(refreshButtonInterface()));
 
     changeCurrentDir(default_path);
 }

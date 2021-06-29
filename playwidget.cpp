@@ -8,7 +8,8 @@ playWidget::playWidget(QWidget *parent) :
     volumeControl = new SystemVolume;
     setWidgetUi();
     //ui->setupUi(this);
-    qDebug() << "volume:"<< volumeControl->GetVolume();
+    currentVolume = volumeControl->GetVolume();
+
 }
 
 playWidget::~playWidget()
@@ -44,6 +45,22 @@ void playWidget::keyPressEvent(QKeyEvent *event)
         strcpy(cmd,button_commands[4].strCommand);
         server->sendMessage(cmd,strlen(cmd));
         qDebug() << "forward 10 seconds" <<endl;
+        break;
+    case Qt::Key_Up:
+        qDebug() << "increase volume";
+        if(currentVolume+5 <= 100){
+            currentVolume += 5;
+            volumeControl->SetVolume(currentVolume);
+            qDebug() << currentVolume;
+        }
+        break;
+    case Qt::Key_Down:
+        qDebug() << "decrease volume";
+        if(currentVolume-5 >= 0){
+            currentVolume -= 5;
+            volumeControl->SetVolume(currentVolume);
+            qDebug() << currentVolume;
+        }
         break;
     default:
         break;

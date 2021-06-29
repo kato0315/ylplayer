@@ -12,6 +12,9 @@ Dialog::Dialog(QWidget *parent) :
 
 Dialog::~Dialog()
 {
+
+
+    delete mainWidget;
     delete ui;
 }
 
@@ -77,8 +80,9 @@ void Dialog::setupShadowBox()
 void Dialog::sendMsgSlot()
 {
     QString seturl = "play:";
-    QString filepath = "/"+mainWidget->getCheckedButton()->text();
+    QString filepath = mainWidget->getCurrentDirPath()+"/"+mainWidget->getCheckedButton()->text();
     filepath.replace(default_path,"");
+    qDebug() <<"filepaht:"<<filepath;
     QByteArray ba = (seturl+filepath).toUtf8();
     server->sendMessage(ba.data(),strlen(ba.data()));
 
@@ -91,6 +95,9 @@ void Dialog::onClickedBtnPlay()
         return;
     }
 
+    p.show();
+    QTimer::singleShot(2000,this,SLOT(sendMsgSlot()));
+/*
     if(server->socketFlag == true){
         p.show();
         QTimer::singleShot(2000,this,SLOT(sendMsgSlot()));
@@ -101,7 +108,7 @@ void Dialog::onClickedBtnPlay()
         msgBox.setText("未连接本地播放器，无法播放！");
         msgBox.exec();
     }
-
+*/
 
 }
 
@@ -194,6 +201,7 @@ void Dialog::setUi()
                          Qt::FramelessWindowHint);//去掉边框
 
     this->setAttribute(Qt::WA_TranslucentBackground);
+    this->setAttribute(Qt::WA_QuitOnClose,true);
 
     //主要参照物
     setFileWidget();

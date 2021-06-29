@@ -35,8 +35,8 @@ namespace Ui {
 class fileWidget;
 }
 
-const QString default_path = "//tsclient/LocalSpace";
-//const QString default_path = "E:/work_station/testvideo";
+//const QString default_path = "//tsclient/LocalSpace";
+const QString default_path = "E:/work_station/testvideo";
 
 const qint64 limitSpace = 2684354560;
 
@@ -83,7 +83,7 @@ private:
     QLabel* fileSpace;
     qint64  usedSpace;
 
-    QFileSystemWatcher* fileWatcher;
+   //QFileSystemWatcher* fileWatcher;
     QDir* currentDir;
     QLabel* videoPathLb;
 
