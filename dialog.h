@@ -3,32 +3,20 @@
 
 #include "playwidget.h"
 #include "filewidget.h"
+#include "server.h"
 
 #include <QDialog>
 #include <QWidget>
 #include <QPushButton>
 #include <QFont>
 #include <QString>
-#include <QListView>
-
 #include <QKeyEvent>
 #include <QPainter>
-#include <QDebug>
-
 #include <QColor>
-
-#include <QToolButton>
-#include <QPixmap>
-#include <QFileInfo>
-#include <QFileIconProvider>
-
-#include <QDir>
-#include <QByteArray>
-
 #include <QDesktopWidget>
-
 #include <QTimer>
-#include "server.h"
+
+//#include <QDebug>
 
 
 namespace Ui {
@@ -44,11 +32,8 @@ protected:
 
 
 private:
-    Ui::Dialog *ui;
-
     QLabel* titleLb;
     QWidget* shadowBox;
-    QWidget* videoLogo;
 
     QPushButton* btnPlay;
     QPushButton* btnAdd;
@@ -76,10 +61,7 @@ private slots:
 public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
-
     void showDialog();
-
-
 
 };
 

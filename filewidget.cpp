@@ -26,62 +26,105 @@ fileWidget::~fileWidget()
     delete ui;
 }
 
+//槽函数
+//返回选中文件的按钮
+QAbstractButton* fileWidget::getCheckedButton()
+{
+    return fileButtonGroup->checkedButton();
+}
+
 //获取目录路径
 QString fileWidget::getCurrentDirPath()
 {
     return currentDir->path();
 }
-//获取目录大小
-quint64 fileWidget::getDirSize(const QString &path)
+
+//添加文件按钮实现复制功能
+void fileWidget::onClickedBtnAdd()
 {
-    QDir dir(path);
-    quint64 size = 0;
+    //qDebug() << "button add" <<endl;
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("添加视频文件"),
+                                                    "D:",
+                                                    tr("Videos (*.avi *.mov *.flv *.MP4)"));//rm不支持
+    if(fileName != NULL){
+        QFile chosenFile(fileName);
+        QFileInfo chosenFileInfo(chosenFile);
 
-    foreach(QFileInfo fileInfo,dir.entryInfoList(QDir::Files)){
-        size += fileInfo.size();
-    }
+        if(chosenFileInfo.path() != currentDir->path())
+        {
+            QString copiedFileName =currentDir->path() + "/" + chosenFileInfo.fileName();
+            //需要将/改为\\才能识别
+            fileName.replace(QRegExp("\\/"),"\\");
+            copiedFileName.replace(QRegExp("\\/"),"\\");
 
-    foreach(QString subDir,dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot)){
-        size += getDirSize(path+QDir::separator()+subDir);
+            wstring pFrom = fileName.toStdWString();
+            wstring pTo = copiedFileName.toStdWString();
+            //扩大wstring空间，保证字符串末端必定为\0
+            pFrom.resize(pFrom.size()+2);
+            pTo.resize(pTo.size()+2);
+            fileOp.pFrom = pFrom.c_str();
+            fileOp.pTo = pTo.c_str();
+            int ret = 0;
+            ret =SHFileOperation(&fileOp);
+            //qDebug() <<"SHFileOp:"<< ret;
+            if(ret == 0)
+                refreshButtonInterface();
+        }
+        else
+            //qDebug() << "same path"<<endl;
+            return;
+
     }
-    return size;
+    else{
+    }
+        //qDebug() << "quit" <<endl;
 }
 
- QString fileWidget::translateDirSize(quint64 size)
- {
-     double translateSize;
-     QString strSize;
-     if(size >= 1024*1024*1024){
-         translateSize = (double)size/(1024*1024*1024);
-         strSize = QString::number(translateSize,'f',1)+"GB/2.5GB";
-         return strSize;
-     }
-     else if(size >= 1024*1024){
-         translateSize = (double)size/(1024*1024);
-         strSize = QString::number(translateSize,'f',1)+"MB/2.5GB";
-         return strSize;
-     }
-     else if(size >= 1024){
-         translateSize = (double)size/1024;
-         strSize = QString::number(translateSize,'f',1)+"KB/2.5GB";
-         return strSize;
-     }
-     else{
-         translateSize = size;
-         strSize = QString::number(translateSize,'f',1)+"B/2.5GB";
-         return strSize;
-     }
-
-
- }
-
-void fileWidget::refreshDirSize()
+//删除按钮实现文件删除功能
+void fileWidget::onClickedBtnDelete()
 {
-    usedSpace = getDirSize(default_path);
-    fileSpace->setText(translateDirSize(usedSpace));
+    //qDebug() << "button delete" <<endl;
+    if(getCheckedButton()!=NULL)
+    {
+        //qDebug() <<getCheckedButton()->text()<<endl;
+        QString deleteFileName = currentDir->path() + "/" +getCheckedButton()->text();
+        QFile deleteFile(deleteFileName);
+
+        if(deleteFile.remove())
+        {
+            //qDebug() << "remove success";
+            refreshButtonInterface();
+            refreshDirSize();
+        }
+        else
+        {
+            //qDebug() << "remove fail";
+            return;
+        }
+
+    }
+    else
+    {
+        //qDebug() << "no checked button"<<endl;
+    }
+
+
 }
 
-//槽函数
+//后退键实现切换上级目录功能
+void fileWidget::onClickedBtnBack()
+{
+
+    if(currentDir->path() != default_path){
+        changeCurrentDir();
+    }
+    else{
+        //qDebug() << "no back" <<endl;
+    }
+
+}
+
 //双击文件夹切换目录
 void fileWidget::onDoubleClickedButton(QString text)
 {
@@ -107,13 +150,12 @@ void fileWidget::enteredFileButton(QString text)
             break;
         }
         if(i == filelist.size()){
-            qDebug() << "no file,something wrong？";
+            //qDebug() << "no file,something wrong？";
             return;
         }
     }
     QString displayText;
     QString sizeString = translateDirSize(chosenFile.size());
-    sizeString.chop(6);
     displayText = "文件名："+chosenFile.fileName()+"\n" +"文件大小："+sizeString;
     fileInfoLabel.setText(displayText);
     fileInfoLabel.move(QCursor::pos().x(),QCursor::pos().y());
@@ -134,7 +176,7 @@ void fileWidget::enteredDirButton(QString text)
             break;
         }
         if(i == filelist.size()){
-            qDebug() << "no file,something wrong？";
+            //qDebug() << "no file,something wrong？";
             return;
         }
     }
@@ -152,228 +194,68 @@ void fileWidget::leftButton()
     fileInfoLabel.close();
 }
 
-//文件数量变动时刷新按钮
- void fileWidget::refreshButtonInterface()
+//获取目录大小
+quint64 fileWidget::getDirSize(const QString &path)
+{
+    QDir dir(path);
+    quint64 size = 0;
+
+    foreach(QFileInfo fileInfo,dir.entryInfoList(QDir::Files)){
+        size += fileInfo.size();
+    }
+
+    foreach(QString subDir,dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot)){
+        size += getDirSize(path+QDir::separator()+subDir);
+    }
+    return size;
+}
+
+//以string形式返回dirsize
+QString fileWidget::translateDirSize(quint64 size)
  {
-     deleteFileButton();
-     createFileButton();
-     refreshDirSize();
+     double translateSize;
+     QString strSize;
+     if(size >= 1024*1024*1024){
+         translateSize = (double)size/(1024*1024*1024);
+         strSize = QString::number(translateSize,'f',1)+"GB";
+         return strSize;
+     }
+     else if(size >= 1024*1024){
+         translateSize = (double)size/(1024*1024);
+         strSize = QString::number(translateSize,'f',1)+"MB";
+         return strSize;
+     }
+     else if(size >= 1024){
+         translateSize = (double)size/1024;
+         strSize = QString::number(translateSize,'f',1)+"KB";
+         return strSize;
+     }
+     else{
+         translateSize = size;
+         strSize = QString::number(translateSize,'f',1)+"B";
+         return strSize;
+     }
+
+
  }
 
-//添加文件按钮实现复制功能
-void fileWidget::onClickedBtnAdd()
+//刷新dirsize显示
+void fileWidget::refreshDirSize()
 {
-    qDebug() << "button add" <<endl;
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("添加视频文件"),
-                                                    "D:",
-                                                    tr("Videos (*.avi *.mov *.flv *.MP4)"));//rm不支持
-    if(fileName != NULL){
-        QFile chosenFile(fileName);
-        QFileInfo chosenFileInfo(chosenFile);
-
-        if(chosenFileInfo.size() + usedSpace > limitSpace){
-            qDebug() << "空间不足";
-            QMessageBox msgBox;
-            msgBox.setText("共享文件夹空间不足，无法复制文件！");
-            msgBox.exec();
-            return;
-        }
-
-        if(chosenFileInfo.path() != currentDir->path())
-        {
-            QString copiedFileName =currentDir->path() + "/" + chosenFileInfo.fileName();
-            //需要将/改为\\才能识别
-            fileName.replace(QRegExp("\\/"),"\\");
-            copiedFileName.replace(QRegExp("\\/"),"\\");
-
-            wstring pFrom = fileName.toStdWString();
-            wstring pTo = copiedFileName.toStdWString();
-            //扩大wstring空间，保证字符串末端必定为\0
-            pFrom.resize(pFrom.size()+2);
-            pTo.resize(pTo.size()+2);
-            fileOp.pFrom = pFrom.c_str();
-            fileOp.pTo = pTo.c_str();
-            int ret = 0;
-            ret =SHFileOperation(&fileOp);
-            qDebug() <<"SHFileOp:"<< ret;
-            if(ret == 0)
-                refreshButtonInterface();
-        }
-        else
-            qDebug() << "same path"<<endl;
-            return;
-
-    }
-    else
-        qDebug() << "quit" <<endl;
-}
-
-//删除按钮实现文件删除功能
-void fileWidget::onClickedBtnDelete()
-{
-    qDebug() << "button delete" <<endl;
-    if(getCheckedButton()!=NULL)
-    {
-        qDebug() <<getCheckedButton()->text()<<endl;
-        QString deleteFileName = currentDir->path() + "/" +getCheckedButton()->text();
-        QFile deleteFile(deleteFileName);
-
-        if(deleteFile.remove())
-        {
-            qDebug() << "remove success";
-            refreshButtonInterface();
-            refreshDirSize();
-        }
-        else
-        {
-            qDebug() << "remove fail";
-            return;
-        }
-
-    }
-    else
-        qDebug() << "no checked button"<<endl;
-
-}
-
-//后退键实现切换上级目录功能
-void fileWidget::onClickedBtnBack()
-{
-
-    if(currentDir->path() != default_path){
-        changeCurrentDir();
-    }
-    else
-        qDebug() << "no back" <<endl;
-}
-
-//设置背景颜色
-void fileWidget::paintEvent(QPaintEvent *)
-{
-    QPainter mainPainter(this);
-    QPen pen1(QColor(38,43,47));
-    QBrush brush(QColor(38,43,47));
-    mainPainter.setPen(pen1);
-    mainPainter.setBrush(brush);
-    mainPainter.drawRect(QRect(0,0,this->width(),this->height()));
-}
-
-//设置基本布局
-void fileWidget::setBackground()
-{
-    QFont titleFont;
-    titleFont.setPointSize(interval_height-10);
-
-    fileTitle = new QLabel(this);
-    fileTitle->setFont(titleFont);
-    fileTitle->setText("所有视频");
-    fileTitle->move(x_position,interval_height);
-    fileTitle->resize(sa_width/2,interval_height);
-    fileTitle->setStyleSheet("color:#ffffff");
-
-    fileSpace = new QLabel(this);
-    fileSpace->setFont(titleFont);
-    fileSpace->move(x_position+sa_width/2,interval_height);
-    fileSpace->resize(sa_width/2,interval_height);
-    fileSpace->setStyleSheet("color:#ffffff");
-    fileSpace->setAlignment(Qt::AlignRight);
-
-
+    usedSpace = getDirSize(default_path);
     fileSpace->setText(translateDirSize(usedSpace));
-
-    dirTitle = new QLabel(this);
-    dirTitle->setFont(titleFont);
-    dirTitle->setText("文件夹");
-    dirTitle->move(x_position,interval_height*3+sa_height);
-    dirTitle->resize(sa_width,interval_height);
-    dirTitle->setStyleSheet("color:#ffffff");
-}
-
-//设置文件显示框
-void fileWidget::setFileArea()
-{
-
-    fileSa = new QScrollArea(this);
-    fileSa->setStyleSheet("background-color:#32363b;");
-    fileSa->setFixedSize(sa_width,sa_height);
-    fileSa->move(x_position,interval_height*2);
-    fileSa->verticalScrollBar();//垂直拖动条
-    fileSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    videoFile = new QWidget();
-    fileSa->setWidget(videoFile);
-
-    videoFile->setGeometry(0,0,sa_width,sa_height);
-    fileButtonGroup = new QButtonGroup(this);
-    fileButtonGroup->setExclusive(true);//设置互斥，实现单选效果
-}
-
-//设置目录显示框
-void fileWidget::setDirArea()
-{
-    dirSa = new QScrollArea(this);
-    dirSa->setStyleSheet("background-color:#32363b;");
-    dirSa->setFixedSize(sa_width,sa_height);
-    dirSa->move(x_position,interval_height*4+sa_height);
-    //dirSa->setGeometry(50,420,700,300);
-    dirSa->verticalScrollBar();//垂直拖动条
-    dirSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    videoDir = new QWidget();
-    dirSa->setWidget(videoDir);
-    videoDir->setGeometry(0,0,sa_width,sa_height);
-
-
-    dirButtonGroup = new QButtonGroup(this);
-    dirButtonGroup->setExclusive(true);
-}
-
-//设置路径显示框
-void fileWidget::setPathArea()
-{
-    currentDir = new QDir();
-    QFont dirFont;
-    dirFont.setPointSize(interval_height-10);
-    videoPathLb = new QLabel(this);
-    videoPathLb->setFont(dirFont);
-    videoPathLb->move(x_position,interval_height*5+sa_height*2);
-    videoPathLb->resize(sa_width,interval_height*1.5);
-    videoPathLb->setStyleSheet("background-color:#212326;color:#ffffff;");
-
-}
-
-//返回选中文件的按钮
-QAbstractButton* fileWidget::getCheckedButton()
-{
-    return fileButtonGroup->checkedButton();
 }
 
 //更换目录时释放原有的按钮
 void fileWidget::deleteDirButton()
 {
-    /*
-    QToolButton* tempbutton;
-    QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
-    for(int i =0;i<dirList.size();i++){
-        tempbutton = (QToolButton*)dirButtonGroup->button(i);
-        delete tempbutton; 
-    }*/
     foreach(QAbstractButton *tempbutton,dirButtonGroup->buttons()){
         delete tempbutton;
     }
 }
 
-
 void fileWidget::deleteFileButton()
 {
-    /*
-    QToolButton* tempbutton;
-    QFileInfoList dirList = currentDir->entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
-    for(int i =0;i<dirList.size();i++){
-        tempbutton = (QToolButton*)fileButtonGroup->button(i);
-        delete tempbutton;
-    }*/
     foreach(QAbstractButton *tempbutton,fileButtonGroup->buttons()){
         delete tempbutton;
     }
@@ -437,13 +319,13 @@ void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
     QByteArray ba = file.filePath().toUtf8();
     ret = avformat_open_input(&fmt_ctx, ba.data(), nullptr, nullptr);
     if (ret != 0) {
-        qDebug() << "avformat_open_input failed" << endl;
+        //qDebug() << "avformat_open_input failed" << endl;
 
     }
 
     ret = avformat_find_stream_info(fmt_ctx,nullptr);
     if (ret != 0) {
-        qDebug() << "avformat_find_stream_info failed" << endl;
+        //qDebug() << "avformat_find_stream_info failed" << endl;
 
     }
     AVPacket* pkt = av_packet_alloc();
@@ -470,13 +352,13 @@ void fileWidget::getVideoPreview(QFileInfo file,QToolButton* fileButton)
                 while( (ret = avcodec_receive_frame(codec_ctx,temp_frame)) ==AVERROR(EAGAIN)){
                     ret = avcodec_send_packet(codec_ctx,pkt);
                     if(ret < 0){
-                        qDebug()<<"failed to send packet to decoder.";
+                        //qDebug()<<"failed to send packet to decoder.";
                         break;
                     }
                 }
 
                 if(ret < 0 && ret != AVERROR_EOF){
-                    qDebug()<<"failed to receive packet from decoder.";
+                    //qDebug()<<"failed to receive packet from decoder.";
                     continue;
                 }
 
@@ -544,7 +426,7 @@ void fileWidget::createFileButton()
 
     if(filelist.size() > 10){
         //文件布局位置超出原界面则扩展原界面大小
-        qDebug() << "resize";
+        //qDebug() << "resize";
         videoFile->resize(sa_width,(sa_height/2)*(filelist.size()/5 + 1));
     }
     else
@@ -579,60 +461,143 @@ void fileWidget::createFileButton()
         connect(fileButton,SIGNAL(leaveButton()),this,SLOT(leftButton()));
         fileButton->show();
     }
-
 }
 
-//更换目录,回到上级目录
-void fileWidget::changeCurrentDir()
+//文件数量变动时刷新按钮
+ void fileWidget::refreshButtonInterface()
+ {
+     deleteFileButton();
+     createFileButton();
+     refreshDirSize();
+ }
+
+ //更换目录,回到上级目录
+ void fileWidget::changeCurrentDir()
+ {
+     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
+     if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
+         deleteDirButton();
+         deleteFileButton();
+     }
+     //修改路径
+     currentDir->cdUp();
+     videoPathLb->setText(currentDir->path());
+     //创建新路径中的文件按钮
+     createDirButton();
+     createFileButton();
+
+ }
+
+ //更换目录
+ void fileWidget::changeCurrentDir(QString dirString)
+ {
+     //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
+     if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
+         deleteDirButton();
+         deleteFileButton();
+     }
+     //修改路径
+     currentDir->cd(dirString);
+     videoPathLb->setText(currentDir->path());
+     //创建新路径中的文件按钮
+     createDirButton();
+     createFileButton();
+ }
+
+//设置背景颜色
+void fileWidget::paintEvent(QPaintEvent *)
 {
-    /*
-    if(currentDir->exists()){
-      fileWatcher->removePath(currentDir->path());
-    }*/
-
-    //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
-    if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
-        deleteDirButton();
-        deleteFileButton();
-    }
-    //修改路径
-    currentDir->cdUp();
-    /*fileWatcher->addPath(currentDir->path());
-    qDebug() << fileWatcher->files();*/
-    videoPathLb->setText(currentDir->path());
-    //创建新路径中的文件按钮
-    createDirButton();
-    createFileButton();
-
+    QPainter mainPainter(this);
+    QPen pen1(QColor(38,43,47));
+    QBrush brush(QColor(38,43,47));
+    mainPainter.setPen(pen1);
+    mainPainter.setBrush(brush);
+    mainPainter.drawRect(QRect(0,0,this->width(),this->height()));
 }
-//更换目录
-void fileWidget::changeCurrentDir(QString dirString)
+
+//设置基本布局
+void fileWidget::setBackground()
 {
-    /*
-    if(currentDir->exists()){
-      fileWatcher->removePath(currentDir->path());
-    }
-*/
-    //先判定原来是否有设置按钮，如果有按钮则把按钮对象释放
-    if( (dirButtonGroup->button(0) != NULL) | (fileButtonGroup->button(0) != NULL) ){
-        deleteDirButton();
-        deleteFileButton();
-    }
-    //修改路径
-    currentDir->cd(dirString);
-    qDebug()<< currentDir->path();
+    QFont titleFont;
+    titleFont.setPointSize(interval_height-10);
 
-    /*
-    bool test = fileWatcher->addPath(currentDir->path());
-    qDebug() << test;
-    qDebug() << fileWatcher->directories();
-*/
-    videoPathLb->setText(currentDir->path());
-    //创建新路径中的文件按钮
-    createDirButton();
-    createFileButton();
+    fileTitle = new QLabel(this);
+    fileTitle->setFont(titleFont);
+    fileTitle->setText("所有视频");
+    fileTitle->move(x_position,interval_height);
+    fileTitle->resize(sa_width/2,interval_height);
+    fileTitle->setStyleSheet("color:#ffffff");
+
+    fileSpace = new QLabel(this);
+    fileSpace->setFont(titleFont);
+    fileSpace->move(x_position+sa_width/2,interval_height);
+    fileSpace->resize(sa_width/2,interval_height);
+    fileSpace->setStyleSheet("color:#ffffff");
+    fileSpace->setAlignment(Qt::AlignRight);
+
+
+    fileSpace->setText(translateDirSize(usedSpace));
+
+    dirTitle = new QLabel(this);
+    dirTitle->setFont(titleFont);
+    dirTitle->setText("文件夹");
+    dirTitle->move(x_position,interval_height*3+sa_height);
+    dirTitle->resize(sa_width,interval_height);
+    dirTitle->setStyleSheet("color:#ffffff");
 }
 
+//设置目录显示框
+void fileWidget::setDirArea()
+{
+    dirSa = new QScrollArea(this);
+    dirSa->setStyleSheet("background-color:#32363b;");
+    dirSa->setFixedSize(sa_width,sa_height);
+    dirSa->move(x_position,interval_height*4+sa_height);
+    //dirSa->setGeometry(50,420,700,300);
+    dirSa->verticalScrollBar();//垂直拖动条
+    dirSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    videoDir = new QWidget();
+    dirSa->setWidget(videoDir);
+    videoDir->setGeometry(0,0,sa_width,sa_height);
+
+
+    dirButtonGroup = new QButtonGroup(this);
+    dirButtonGroup->setExclusive(true);
+}
+
+//设置文件显示框
+void fileWidget::setFileArea()
+{
+
+    fileSa = new QScrollArea(this);
+    fileSa->setStyleSheet("background-color:#32363b;");
+    fileSa->setFixedSize(sa_width,sa_height);
+    fileSa->move(x_position,interval_height*2);
+    fileSa->verticalScrollBar();//垂直拖动条
+    fileSa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    videoFile = new QWidget();
+    fileSa->setWidget(videoFile);
+
+    videoFile->setGeometry(0,0,sa_width,sa_height);
+    fileButtonGroup = new QButtonGroup(this);
+    fileButtonGroup->setExclusive(true);//设置互斥，实现单选效果
+}
+
+//设置路径显示框
+void fileWidget::setPathArea()
+{
+    currentDir = new QDir();
+    QFont dirFont;
+    dirFont.setPointSize(interval_height-10);
+    videoPathLb = new QLabel(this);
+    videoPathLb->setFont(dirFont);
+    videoPathLb->move(x_position,interval_height*5+sa_height*2);
+    videoPathLb->resize(sa_width,interval_height*1.5);
+    videoPathLb->setStyleSheet("background-color:#212326;color:#ffffff;");
+
+}
 
 void fileWidget::setFileInfoText()
 {
@@ -660,10 +625,6 @@ void fileWidget::uiInit()
     setDirArea();
     setBackground();
     setPathArea();
-
-    //fileWatcher用于监视当前目录的文件信息，当更换目录或目录内文件数量变化时刷新界面，改变相应的按钮
-    //fileWatcher = new QFileSystemWatcher();
-    //connect(fileWatcher,SIGNAL(directoryChanged(QString)),this,SLOT(refreshButtonInterface()));
 
     changeCurrentDir(default_path);
 }

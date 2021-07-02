@@ -5,8 +5,10 @@
 #-------------------------------------------------
 
 QT       += core gui network multimedia
-QT       += axcontainer
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+RC_FILE = res.rc
 
 TARGET = ylplayer
 TEMPLATE = app
@@ -21,14 +23,12 @@ SOURCES += main.cpp\
     filewidget.cpp \
     playwidget.cpp \
     server.cpp \
-    systemvolume.cpp \
     toolbutton.cpp
 
 HEADERS  += dialog.h \
     filewidget.h \
     playwidget.h \
     server.h \
-    systemvolume.h \
     toolbutton.h
 
 FORMS    += dialog.ui \

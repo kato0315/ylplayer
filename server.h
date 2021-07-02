@@ -2,49 +2,21 @@
 #define SERVER_H
 
 #include <QObject>
-
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <QDebug>
+
 #include <QString>
 
+//#include <QDebug>
 
-//xplayer定义
-/*
-#define COMMAND_SET_SOURCE      0x101   // set url of media file.
-#define COMMAND_PLAY            0x102   // start playback.
-#define COMMAND_PAUSE           0x103   // pause the playback.
-#define COMMAND_STOP            0x104   // stop the playback.
-#define COMMAND_SEEKTO          0x105   // seek to posion, in unit of second.
-#define COMMAND_SHOW_MEDIAINFO  0x106   // show media information.
-#define COMMAND_SHOW_DURATION   0x107   // show media duration, in unit of second.
-#define COMMAND_SHOW_POSITION   0x108   // show current play position, in unit of second.
-
-typedef struct Command
-{
-    const char* strCommand;
-    int nCommandId;
-}Command;
-
-const Command commands[] =
-{
-    {"set url:",COMMAND_SET_SOURCE},
-    {"play",COMMAND_PLAY},
-    {"pause",COMMAND_PAUSE},
-    {"stop",COMMAND_STOP},
-    {"seek to",COMMAND_SEEKTO},
-    {"show media info",COMMAND_SHOW_MEDIAINFO},
-    {"show duration",COMMAND_SHOW_DURATION},
-    {"show position",COMMAND_SHOW_POSITION},
-    {"NULL",0}
-};
-*/
 //自定义
 #define COMMAND_PLAY_BUTTON     0x0001
 #define COMMAND_PAUSE_BUTTON    0x0002
 #define COMMAND_STOP_BUTTON     0x0003
 #define COMMAND_FORWARD_BUTTON  0x0004
 #define COMMAND_BACK_BUTTON     0x0005
+#define COMMAND_VOLUME_INCREASE 0x0006
+#define COMMAND_VOLUME_DECREASE 0x0007
 
 typedef struct Button_Command{
     const char* strCommand;
@@ -58,6 +30,8 @@ const Button_Command button_commands[]=
     {"stop",COMMAND_STOP_BUTTON},
     {"forward",COMMAND_FORWARD_BUTTON},
     {"back",COMMAND_BACK_BUTTON},
+    {"volumeincrease",COMMAND_VOLUME_INCREASE},
+    {"volumedecrease",COMMAND_VOLUME_DECREASE},
     {NULL,0}
 };
 

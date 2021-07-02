@@ -2,20 +2,14 @@
 #include "ui_dialog.h"
 
 Dialog::Dialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::Dialog)
+    QDialog(parent)
 {
-
     setUi();
-    ui->setupUi(this);
 }
 
 Dialog::~Dialog()
 {
-
-
-    delete mainWidget;
-    delete ui;
+    delete mainWidget; 
 }
 
 //按键设置与屏蔽
@@ -27,7 +21,6 @@ void Dialog::keyPressEvent(QKeyEvent *event)
         break;
     default:
         QDialog::keyPressEvent(event);
-
     }
 }
 
@@ -41,7 +34,6 @@ void Dialog::paintEvent(QPaintEvent *)
     titlePainter.setPen(pen);
     titlePainter.setBrush(brush);
     titlePainter.drawRect(QRect(0,0,this->width(),this->height()/10));
-
 }
 
 //阴影背景
@@ -64,19 +56,9 @@ void Dialog::setupShadowBox()
     shadowBox->move(0,0);
     shadowBox->resize(this->width(),this->height());
     shadowBox->lower();
-/*
-    videoLogo = new QWidget(this);
-    videoLogo->setStyleSheet("QWidget{background-color:rgb(255,255,255);"
-                             "border-image:url(:/videologo.png)"
-                             "}");
-
-    videoLogo->resize(this->width()/16*2,this->width()/16*2);
-    videoLogo->move(mainWidget->x()-videoLogo->width()-20,mainWidget->y());
-    */
 }
 
 //按键函数
-
 void Dialog::sendMsgSlot()
 {
     QString seturl = "play:";
@@ -87,6 +69,7 @@ void Dialog::sendMsgSlot()
     server->sendMessage(ba.data(),strlen(ba.data()));
 
 }
+
 void Dialog::onClickedBtnPlay()
 {
     qDebug() << "test BtnPlay" <<endl;
@@ -94,10 +77,10 @@ void Dialog::onClickedBtnPlay()
     if(mainWidget->getCheckedButton() == 0){
         return;
     }
-
+    /*
     p.show();
     QTimer::singleShot(2000,this,SLOT(sendMsgSlot()));
-/*
+*/
     if(server->socketFlag == true){
         p.show();
         QTimer::singleShot(2000,this,SLOT(sendMsgSlot()));
@@ -108,8 +91,6 @@ void Dialog::onClickedBtnPlay()
         msgBox.setText("未连接本地播放器，无法播放！");
         msgBox.exec();
     }
-*/
-
 }
 
 
@@ -173,20 +154,14 @@ void Dialog::setBtn()
 
 void Dialog::setFileWidget()
 {
-    //mainWidget = new fileWidget(this);
-   // mainWidget->setGeometry((this->width()/2 - this->height()/9*7/2),(this->height()/2 - this->height()/9*7/2),this->height()/9*7,this->height()/9*7);
-
     mainWidget = new fileWidget(this->height()/9*7,this->height()/9*7,this);
     mainWidget->move((this->width()/2 - this->height()/9*7/2),(this->height()/2 - this->height()/9*7/2));
 }
 
 void Dialog::setPlayWidget()
 {
-   // p = new playWidget(this);
-   // p.setStyleSheet("border-image:url(:/quit.png)");
     p.setGeometry(0,0,this->width(),this->height());
-    p.server = this->server;
-    //p->close();
+    p.setServer(this->server);
 }
 
 void Dialog::setUi()

@@ -3,7 +3,7 @@
 
 #include <QToolButton>
 #include <QMouseEvent>
-#include <QDebug>
+//#include <QDebug>
 
 
 class toolbutton :public QToolButton

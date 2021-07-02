@@ -2,7 +2,6 @@
 #define FILEWIDGET_H
 
 #include <QWidget>
-#include <QToolButton>
 #include <QLabel>
 #include <QPixmap>
 #include <QFileInfo>
@@ -10,18 +9,17 @@
 #include <QPainter>
 #include <QDir>
 #include <QString>
-#include <QDebug>
 #include <QButtonGroup>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <toolbutton.h>
-
 #include <QTime>
-#include <QFileSystemWatcher>
+
 #include <Shlwapi.h>
 
+//#include <QDebug>
 
 using namespace std;
 extern "C"
@@ -35,10 +33,9 @@ namespace Ui {
 class fileWidget;
 }
 
-//const QString default_path = "//tsclient/LocalSpace";
-const QString default_path = "E:/work_station/testvideo";
+const QString default_path = "//tsclient/LocalSpace";
+//const QString default_path = "E:/work_station/testvideo";
 
-const qint64 limitSpace = 2684354560;
 
 class fileWidget : public QWidget
 {
@@ -50,24 +47,18 @@ public:
     ~fileWidget();
 
     QAbstractButton* getCheckedButton();
-
     QString getCurrentDirPath();
-    quint64 getDirSize(const QString &path);
-    QString translateDirSize(quint64 size);
-    void refreshDirSize();
+
+public slots:
+    void onClickedBtnAdd();
+    void onClickedBtnDelete();
+    void onClickedBtnBack();
 
 protected slots:
     void onDoubleClickedButton(QString text);
     void enteredFileButton(QString text);
     void enteredDirButton(QString text);
     void leftButton();
-
-    void refreshButtonInterface();
-
-public slots:
-    void onClickedBtnAdd();
-    void onClickedBtnDelete();
-    void onClickedBtnBack();
 
 
 private:
@@ -83,7 +74,6 @@ private:
     QLabel* fileSpace;
     qint64  usedSpace;
 
-   //QFileSystemWatcher* fileWatcher;
     QDir* currentDir;
     QLabel* videoPathLb;
 
@@ -100,7 +90,19 @@ private:
     SHFILEOPSTRUCT fileOp;
     QLabel fileInfoLabel;
 
+    quint64 getDirSize(const QString &path);
+    QString translateDirSize(quint64 size);
+    void refreshDirSize();
 
+    void deleteDirButton();
+    void deleteFileButton();
+    void createDirButton();
+    void getVideoPreview(QFileInfo file,QToolButton* fileButton);
+    void createFileButton();
+    void refreshButtonInterface();
+
+    void changeCurrentDir();
+    void changeCurrentDir(QString dirString);
 
     void paintEvent(QPaintEvent*);
     void setBackground();
@@ -111,14 +113,11 @@ private:
     void setFileOp();
     void uiInit();
 
-    void deleteDirButton();
-    void deleteFileButton();
-    void createDirButton();
-    void createFileButton();
-    void changeCurrentDir();
-    void changeCurrentDir(QString dirString);
 
-    void getVideoPreview(QFileInfo file,QToolButton* fileButton);
+
+
+
+
 
 
 };

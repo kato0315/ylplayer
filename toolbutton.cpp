@@ -13,7 +13,6 @@ toolbutton::~toolbutton()
 void toolbutton::mouseDoubleClickEvent(QMouseEvent *ev)
 {
     if(ev->button() == Qt::LeftButton){
-
         //qDebug() << "double click test";
         emit doubleClicked(this->text());
     }
@@ -22,7 +21,6 @@ void toolbutton::mouseDoubleClickEvent(QMouseEvent *ev)
 void toolbutton::enterEvent(QEvent *)
 {
     //qDebug() << "鼠标移入按键";
-
     emit enterButton(this->text());
 }
 

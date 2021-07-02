@@ -9,8 +9,6 @@ Server::Server(QObject *parent) : QTcpServer(parent)
 
 void Server::incomingConnection(qintptr handle)
 {
-
-
     socket = new QTcpSocket(this);
     socket->setSocketDescriptor(handle);
     connect(socket,SIGNAL(readyRead()),this,SLOT(receiveMessage()));

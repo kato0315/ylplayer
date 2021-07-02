@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QKeyEvent>
 #include <QCloseEvent>
-#include <QDebug>
+
 
 #include <QLabel>
 #include <QPixmap>
@@ -12,9 +12,9 @@
 #include <QPainter>
 
 #include "server.h"
-#include "systemvolume.h"
 
-using namespace SystemConf;
+//#include <QDebug>
+
 
 namespace Ui {
 class playWidget;
@@ -30,24 +30,20 @@ private slots:
     void setWidgetUi();
     void keyPressEvent(QKeyEvent *event);
     void closeEvent(QCloseEvent *event);
-
     void paintEvent(QPaintEvent *);
+
 public:
     explicit playWidget(QWidget *parent = 0);
     ~playWidget();
 
+    void setServer(Server *s);
 
-    Server *server;
 private:
     Ui::playWidget *ui;
     QLabel* lblBg;
     char cmd[1024];
     bool quit;
-
-    SystemVolume* volumeControl;
-    int currentVolume;
-
-
+    Server *server;
 
 };
 
