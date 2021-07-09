@@ -8,8 +8,11 @@ int main(int argc, char *argv[])
     a.connect(&a,SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
     Dialog w; 
 
-    w.showFullScreen();
-    //w.showDialog();
+    //w.showFullScreen();
+    if(w.showDialog() ==true){
+        return a.exec();
+    }
+    else
+        return 0;
 
-    return a.exec();
 }

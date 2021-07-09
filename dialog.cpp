@@ -187,16 +187,17 @@ void Dialog::setUi()
 
 }
 
-void Dialog::showDialog()
+bool Dialog::showDialog()
 {
     if(QDir(default_path).exists()){
         this->showFullScreen();
+        return true;
     }
     else{
         QMessageBox msgbox;
         msgbox.setText("未能找到共享文件夹，请在虚拟机登陆方式模式一下使用该播放器。");
         msgbox.exec();
-
+        return false;
     }
 
 }

@@ -136,54 +136,19 @@ void fileWidget::onDoubleClickedButton(QString text)
 void fileWidget::enteredFileButton(QString text)
 {
   //  qDebug() << "enter file button:" <<text;
-    QFileInfo chosenFile;
-    QDir tmpDir = *currentDir;
-    QStringList filter;
-    int i;
-    filter << "*.avi"<< "*.mov"<< "*.flv" << "*.MP4";   //过滤后缀名
-    tmpDir.setNameFilters(filter);
-    QFileInfoList filelist = tmpDir.entryInfoList(QDir::Filter::Files,QDir::SortFlag::Name);
-
-    for(i =0;i<filelist.size();i++){
-        if(filelist.at(i).fileName() == text){
-            chosenFile = filelist.at(i);
-            break;
-        }
-        if(i == filelist.size()){
-            //qDebug() << "no file,something wrong？";
-            return;
-        }
-    }
-    QString displayText;
+    QFileInfo chosenFile= currentDir->path()+"/"+text;
     QString sizeString = translateDirSize(chosenFile.size());
-    displayText = "文件名："+chosenFile.fileName()+"\n" +"文件大小："+sizeString;
+    QString displayText = "文件名："+chosenFile.fileName()+"\n" +"文件大小："+sizeString;
     fileInfoLabel.setText(displayText);
-    fileInfoLabel.move(QCursor::pos().x(),QCursor::pos().y());
+    fileInfoLabel.move(QCursor::pos().x()+10,QCursor::pos().y()+10);
     fileInfoLabel.show();
 }
 
 //鼠标指针指向文件夹时显示文件夹名
 void fileWidget::enteredDirButton(QString text)
 {
-    QFileInfo chosenFile;
-    QDir tmpDir = *currentDir;
-    int i;
-    QFileInfoList filelist = tmpDir.entryInfoList(QDir::Filter::Dirs | QDir::NoDotAndDotDot,QDir::SortFlag::Name);
-
-    for(i =0;i<filelist.size();i++){
-        if(filelist.at(i).fileName() == text){
-            chosenFile = filelist.at(i);
-            break;
-        }
-        if(i == filelist.size()){
-            //qDebug() << "no file,something wrong？";
-            return;
-        }
-    }
-    QString displayText;
-    displayText = "文件夹名："+chosenFile.fileName();
-    fileInfoLabel.setText(displayText);
-    fileInfoLabel.move(QCursor::pos().x(),QCursor::pos().y());
+    fileInfoLabel.setText("文件夹名："+text);
+    fileInfoLabel.move(QCursor::pos().x()+10,QCursor::pos().y()+10);
     fileInfoLabel.show();
 }
 
