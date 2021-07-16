@@ -4,26 +4,21 @@
 
 
 fileWidget::fileWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::fileWidget)
+    QWidget(parent)
 {
     uiInit();
-    ui->setupUi(this);
 }
 
 fileWidget::fileWidget(int width,int height,QWidget *parent):
-    QWidget(parent),
-    ui(new Ui::fileWidget)
+    QWidget(parent)
 {
     this->setFixedSize(width,height);
     uiInit();
-    ui->setupUi(this);
 }
 
 fileWidget::~fileWidget()
 {
 
-    delete ui;
 }
 
 //槽函数
@@ -129,34 +124,41 @@ void fileWidget::onClickedBtnBack()
 void fileWidget::onDoubleClickedButton(QString text)
 {
     changeCurrentDir(text);
-    fileInfoLabel.close();
+    //if(fileInfoLabel != nullptr)
+     //   delete fileInfoLabel;
+    fileInfoLabel->close();
 }
 
 //鼠标指针指向文件时显示文件信息
 void fileWidget::enteredFileButton(QString text)
 {
+
+
   //  qDebug() << "enter file button:" <<text;
     QFileInfo chosenFile= currentDir->path()+"/"+text;
     QString sizeString = translateDirSize(chosenFile.size());
     QString displayText = "文件名："+chosenFile.fileName()+"\n" +"文件大小："+sizeString;
-    fileInfoLabel.setText(displayText);
-    fileInfoLabel.move(QCursor::pos().x()+10,QCursor::pos().y()+10);
-    fileInfoLabel.show();
+    fileInfoLabel->setText(displayText);
+    fileInfoLabel->move(QCursor::pos().x()+10,QCursor::pos().y()+10);
+    fileInfoLabel->show();
 }
 
 //鼠标指针指向文件夹时显示文件夹名
 void fileWidget::enteredDirButton(QString text)
 {
-    fileInfoLabel.setText("文件夹名："+text);
-    fileInfoLabel.move(QCursor::pos().x()+10,QCursor::pos().y()+10);
-    fileInfoLabel.show();
+
+    fileInfoLabel->setText("文件夹名："+text);
+    fileInfoLabel->move(QCursor::pos().x()+10,QCursor::pos().y()+10);
+    fileInfoLabel->show();
 }
 
 //鼠标指针离开文件或文件夹时关闭显示的label
 void fileWidget::leftButton()
 {
     //qDebug() << "left button";
-    fileInfoLabel.close();
+    fileInfoLabel->close();
+    //if(fileInfoLabel != nullptr)
+     //   delete fileInfoLabel;
 }
 
 //获取目录大小
@@ -566,7 +568,9 @@ void fileWidget::setPathArea()
 
 void fileWidget::setFileInfoText()
 {
-    fileInfoLabel.setWindowFlag(Qt::FramelessWindowHint);
+    fileInfoLabel = new QLabel();
+    fileInfoLabel->setWindowFlag(Qt::FramelessWindowHint);
+    fileInfoLabel->close();
 }
 
  void fileWidget::setFileOp()

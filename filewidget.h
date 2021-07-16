@@ -62,7 +62,7 @@ protected slots:
 
 
 private:
-    Ui::fileWidget *ui;
+
 
     int sa_width;
     int sa_height;
@@ -88,7 +88,7 @@ private:
     QButtonGroup* dirButtonGroup;
 
     SHFILEOPSTRUCT fileOp;
-    QLabel fileInfoLabel;
+    QLabel *fileInfoLabel;
 
     quint64 getDirSize(const QString &path);
     QString translateDirSize(quint64 size);

@@ -1,4 +1,4 @@
-#include "dialog.h"
+#include "mainwindow.h"
 #include <QApplication>
 
 
@@ -6,10 +6,13 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.connect(&a,SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
-    Dialog w; 
+    MainWindow w;
+/*
+    w.showFullScreen();
+    return a.exec();
+*/
 
-    //w.showFullScreen();
-    if(w.showDialog() ==true){
+    if(w.showMainWindow() ==true){
         return a.exec();
     }
     else

@@ -17,6 +17,7 @@
 #define COMMAND_BACK_BUTTON     0x0005
 #define COMMAND_VOLUME_INCREASE 0x0006
 #define COMMAND_VOLUME_DECREASE 0x0007
+#define COMMAND_PLAYHTTP_BUTTON 0x0011
 
 typedef struct Button_Command{
     const char* strCommand;
@@ -32,6 +33,7 @@ const Button_Command button_commands[]=
     {"back",COMMAND_BACK_BUTTON},
     {"volumeincrease",COMMAND_VOLUME_INCREASE},
     {"volumedecrease",COMMAND_VOLUME_DECREASE},
+    {"playhttp:",COMMAND_PLAYHTTP_BUTTON},
     {NULL,0}
 };
 

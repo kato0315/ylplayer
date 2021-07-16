@@ -19,20 +19,20 @@ LIBS += -L..\\ylplayer\\dependency\\ffmpeg-4.4-full_build-shared\\lib -lavcodec 
 LIBS += -lshlwapi
 
 SOURCES += main.cpp\
-        dialog.cpp \
     filewidget.cpp \
+    mainwindow.cpp \
     playwidget.cpp \
     server.cpp \
     toolbutton.cpp
 
-HEADERS  += dialog.h \
+HEADERS  += \
     filewidget.h \
+    mainwindow.h \
     playwidget.h \
     server.h \
     toolbutton.h
 
-FORMS    += dialog.ui \
-    filewidget.ui
+FORMS    +=
 
 RESOURCES += \
     resource/resource.qrc

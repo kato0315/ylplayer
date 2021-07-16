@@ -1,11 +1,11 @@
-#ifndef DIALOG_H
-#define DIALOG_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include "playwidget.h"
 #include "filewidget.h"
 #include "server.h"
 
-#include <QDialog>
+#include <QApplication>
 #include <QWidget>
 #include <QPushButton>
 #include <QFont>
@@ -15,15 +15,14 @@
 #include <QColor>
 #include <QDesktopWidget>
 #include <QTimer>
+#include <QInputDialog>
+
+#include "libavformat/avformat.h"
 
 //#include <QDebug>
 
 
-namespace Ui {
-class Dialog;
-}
-
-class Dialog : public QDialog
+class MainWindow : public QWidget
 {
     Q_OBJECT
 protected:
@@ -36,6 +35,7 @@ private:
     QWidget* shadowBox;
 
     QPushButton* btnPlay;
+    QPushButton* btnPlayHttp;
     QPushButton* btnAdd;
     QPushButton* btnDelete;
     QPushButton* btnQuit;
@@ -53,16 +53,18 @@ private slots:
     void setPlayWidget();
 
     void onClickedBtnPlay();
+    void onClickedBtnPlayHttp();
     void sendMsgSlot();
+    void sendUrlSlot(QString url);
 
     void paintEvent(QPaintEvent *);
 
 
 public:
-    explicit Dialog(QWidget *parent = 0);
-    ~Dialog();
-    bool showDialog();
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+    bool showMainWindow();
 
 };
 
-#endif // DIALOG_H
+#endif // MAINWINDOW_H
